@@ -1,0 +1,4 @@
+connexion
+Flask
+flask-sqlalchemy
+"connexion[swagger-ui]"

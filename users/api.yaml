@@ -1,0 +1,341 @@
+openapi: 3.0.1
+info:
+  title: Users microservice REST API
+  description: Users from GoOutSafe with Microservices
+  version: "0.1"
+servers:
+- url: /
+
+paths:
+  /users/{user_id}/contacts:
+    get:
+      tags:
+        - Users
+      summary: Get the Users
+      operationId: users.get_contacts
+      parameters:
+        - in: path
+          name: user_id
+          description: User's unique identifier
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Return all contacts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users:
+    get:
+      tags:
+      - Users
+      summary: Get the Users
+      operationId: users.get_users
+      parameters:
+      - in: query
+        name: ssn
+        description: User's SSN identifier
+        schema:
+          type: string
+      - in: query
+        name: email
+        description: User's email
+        schema:
+          type: string
+      - in: query
+        name: phone
+        description: User's phone number
+        schema:
+          type: string
+      - in: query
+        name: is_positive
+        description: Boolean equals true if the user is positive
+        schema:
+          type: string
+      responses:
+        200:
+          description: Return all users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+      - Users
+      summary: Create new user
+      operationId: users.create_user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        201:
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        409:
+          description: Impossible to create the user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Server error (try again)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+
+  /users/{user_id}:
+    get:
+      tags:
+      - Users
+      summary: get the user
+      operationId: users.get_id_user
+      parameters:
+      - in: path
+        name: user_id
+        description: User's unique identifier
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Return user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+      - User
+      summary: Edit a user
+      operationId: users.edit_user
+      parameters:
+        - in: path
+          name: user_id
+          description: User's unique identifier
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        200:
+          description: User edited
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        409:
+          description: Impossible to edit the user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+            description: Server error (try again)
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+      - User
+      summary: Delete a user
+      operationId: users.delete_user
+      parameters:
+        - in: path
+          name: user_id
+          description: User's unique identifier
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: User deleted successfully
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Server error (try again)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Error type
+          example: about:blank
+        title:
+          type: string
+          description: Error name
+          example: Bad Request
+        status:
+          type: integer
+          description: Error status code
+          example: about:blank
+        detail:
+          type: string
+          description: Error description
+          example: None is not of type 'string'
+    User:
+      type: object
+      required:
+        - id
+        - email
+        - firstname
+        - lastname
+        - phone
+        - dateofbirth
+        - password
+        - password_repeat
+      properties:
+        id:
+          type: integer
+          description: Unique User's identifier
+          readOnly: true
+          example: 122
+        email:
+          maxLength: 50
+          minLength: 5
+          type: string
+          description: User's email
+          example: "Anna@example.com"
+        firstname:
+          maxLength: 100
+          minLength: 3
+          type: string
+          description: User's firstname
+          example: "Anna"
+        lastname:
+          maxLength: 100
+          minLength: 3
+          type: string
+          description: User's lastname
+          example: "Verdi"
+        password:
+          maxLength: 20
+          minLength: 3
+          type: string
+          description: User's password
+          example: "xxx"
+        password_repeat:
+          maxLength: 20
+          minLength: 3
+          type: string
+          description: User's password
+          example: "xxx"
+        old_password:
+          maxLength: 20
+          minLength: 3
+          type: string
+          description: User's old password (to confirm the editing of the user)
+          example: "xxx"
+        phone:
+          type: string
+          description:  User's telephone number
+          example: "397673154"
+        dateofbirth:
+          type: string
+          format: date-time
+          description: User's date of birth
+          example: "1960-11-10T10:30:00+1:00"
+        ssn:
+          maxLength: 16
+          minLength: 16
+          type: string
+          description: Unique User's identifier
+          readOnly: true
+          example: "VRDNNAC5H58H762R"
+        is_operator:
+          example: false
+          type: boolean
+        is_positive:
+          type: boolean
+          example: false
+        is_health_authority:
+          example: false
+          type: boolean
+        is_active:
+          example: false
+          type: boolean
+        is_admin:
+          example: false
+          type: boolean
+        is_anonymous:
+          example: false
+          type: boolean
+        positive_datetime:
+          type: string
+          format: date-time
+          description: When the user was marked as positive
+          example: "2020-11-10T10:30:00+1:00"
+
+
