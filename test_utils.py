@@ -22,7 +22,7 @@ class UsersUtils(unittest.TestCase):
         json = new_user.to_json()
         with self.app.app_context():
             response = add_user('Chiara', 'Guidotti', 'chiara@example.com', 'chiara', '23756820', birth)
-            self.assertNotEquals(response, 500)
+            self.assertNotEqual(response, 500)
 
     def test_delete_user_(self):
         pass

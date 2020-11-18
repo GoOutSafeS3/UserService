@@ -255,7 +255,6 @@ components:
         - phone
         - dateofbirth
         - password
-        - password_repeat
       properties:
         id:
           type: integer
@@ -312,7 +311,6 @@ components:
           minLength: 16
           type: string
           description: Unique User's identifier
-          readOnly: true
           example: "VRDNNAC5H58H762R"
         is_operator:
           example: false

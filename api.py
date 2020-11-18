@@ -93,22 +93,32 @@ def edit_user(user_id):
     user = db.session.query(User).filter_by(id=user_id).first()
     user_email = db.session.query(User).filter_by(email=req['email']).first()
     if user_email is not None:
-        return Error400("The email already exist").get()
+        if user_email.id != user_id:
+            return Error400("The email already exist").get()
     user_phone = db.session.query(User).filter_by(phone=req['phone']).first()
     if user_phone is not None:
-        return Error400("The phone already exist").get()
+        if user_phone.id != user_id:
+            return Error400("The phone already exist").get()
     if not user:
         return Error404("User not found").get()
     try:
         user.firstname = req['firstname']
         user.lastname = req['lastname']
         user.email = req['email']
+        dateofbirth = req['dateofbirth']
+        user.dateofbirth = datetime.datetime.strptime(dateofbirth[:10], '%Y-%m-%d')
         user.set_password(req['password'])
         user.phone = req['phone']
-        if req['is_positive'] is True:
+        if req['is_positive'] == 'True':
             user.is_positive = True
             user.positive_datetime = datetime.datetime.today()
-        user.ssn = req['ssn']
+        if req['ssn'] == '':
+            user.ssn = None
+        else:
+            user_ssn = db.session.query(User).filter_by(ssn=req['ssn']).first()
+            if user_ssn is not None and user_ssn.id != user_id:
+                return Error400("The ssn already exist").get()
+            user.ssn = req['ssn']
         db.session.commit()
     except:
         db.session.rollback()
