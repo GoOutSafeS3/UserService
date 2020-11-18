@@ -1,4 +1,5 @@
 connexion
 Flask
+flask
 flask-sqlalchemy
-"connexion[swagger-ui]"
+pytest

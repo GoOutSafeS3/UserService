@@ -8,6 +8,7 @@ A error object has 4 properties:
     - detail (a description of the error and it's causes)
 """
 
+
 class Error:
     def __init__(self, type, title, status, detail):
         """ General error """

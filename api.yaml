@@ -10,15 +10,15 @@ paths:
   /users/{user_id}/contacts:
     get:
       tags:
-        - Users
-      summary: Get the Users
-      operationId: users.get_contacts
+      - Users
+      summary: Get the User contacts
+      operationId: api.get_user_contacts
       parameters:
-        - in: path
-          name: user_id
-          description: User's unique identifier
-          schema:
-            type: integer
+      - in: path
+        name: user_id
+        description: User's unique identifier
+        schema:
+          type: integer
       responses:
         200:
           description: Return all contacts
@@ -40,7 +40,7 @@ paths:
       tags:
       - Users
       summary: Get the Users
-      operationId: users.get_users
+      operationId: api.get_users
       parameters:
       - in: query
         name: ssn
@@ -81,7 +81,7 @@ paths:
       tags:
       - Users
       summary: Create new user
-      operationId: users.create_user
+      operationId: api.create_user
       requestBody:
         content:
           application/json:
@@ -119,7 +119,7 @@ paths:
       tags:
       - Users
       summary: get the user
-      operationId: users.get_id_user
+      operationId: api.get_id_user
       parameters:
       - in: path
         name: user_id
@@ -151,7 +151,7 @@ paths:
       tags:
       - User
       summary: Edit a user
-      operationId: users.edit_user
+      operationId: api.edit_user
       parameters:
         - in: path
           name: user_id
@@ -199,7 +199,7 @@ paths:
       tags:
       - User
       summary: Delete a user
-      operationId: users.delete_user
+      operationId: api.delete_user
       parameters:
         - in: path
           name: user_id

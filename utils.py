@@ -1,9 +1,8 @@
-from flask import current_app
 from database import User, db
 from errors import Error500, Error404
 
 
-def add_user(firstname, lastname, email, password, phone, dateofbirth, is_health=None, is_operator=None, is_admin=None):
+def add_user(firstname, lastname, email, password, phone, dateofbirth, ssn=None, is_health=None, is_operator=None, is_admin=None):
     new_user = User()
     try:
         new_user.firstname = firstname
@@ -12,6 +11,8 @@ def add_user(firstname, lastname, email, password, phone, dateofbirth, is_health
         new_user.set_password(password=password)
         new_user.phone = phone
         new_user.dateofbirth = dateofbirth
+        if ssn is not None:
+            new_user.ssn = ssn
         if is_health is not None and is_operator is None and is_admin is None:
             new_user.is_health_authority = is_health
         if is_operator is not None and is_admin is None and is_health is None:
@@ -38,7 +39,7 @@ def delete_user_(user_id):
             "title": 'user deleted successfully',
             "status": 201,
             "detail": '',
-        }
-    except:
+        }, 201
+    except: # pragma : no cover
         db.session.rollback()
         return Error500("Server error, try again").get()
