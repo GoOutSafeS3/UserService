@@ -1,5 +1,6 @@
 import unittest
 from app import create_app
+import requests_mock
 
 
 class UsersTest(unittest.TestCase):
@@ -116,6 +117,7 @@ class UsersTest(unittest.TestCase):
             'firstname': 'Anna',
             'lastname': 'Rossi',
             'email': "anna@example.com",
+            'old_password': "anna",
             'password': "anna",
             'password_repeat': "anna",
             'phone': "46968411",
@@ -136,6 +138,7 @@ class UsersTest(unittest.TestCase):
             'firstname': 'Admin',
             'lastname': 'Rossi',
             'email': "anna@example.com",
+            'old_password': "admin",
             'password': "anna",
             'password_repeat': "anna",
             'phone': "46968411",
@@ -158,6 +161,7 @@ class UsersTest(unittest.TestCase):
             'firstname': 'Giada',
             'lastname': 'Verdi',
             'email': "giada@example.com",
+            'old_password': "operator",
             'password': "anna",
             'password_repeat': "anna",
             'phone': "4696855791",
@@ -181,6 +185,29 @@ class UsersTest(unittest.TestCase):
             'firstname': 'Giada',
             'lastname': 'Verdi',
             'email': "giada@example.com",
+            'old_password': "operator",
+            'password': "anna",
+            'password_repeat': "anna",
+            'phone': "46968411",
+            'dateofbirth': "1990-11-11",
+            'is_positive': True
+        }
+        response = client.put('/users/2', json=modify_user)
+        json = response.get_json()
+        self.assertEqual(response.status_code, 400)
+        expected_error = {'detail': 'The phone already exist',
+                          'status': 400,
+                          'title': 'Bad Request',
+                          'type': 'about:blank'}
+        self.assertDictEqual(json, expected_error)
+
+    def test_edit_user_400old_pw(self):
+        client = self.app.test_client()
+        modify_user = {
+            'firstname': 'Giada',
+            'lastname': 'Verdi',
+            'email': "giada@example.com",
+            'old_password': "errata",
             'password': "anna",
             'password_repeat': "anna",
             'phone': "46968411",
@@ -191,12 +218,20 @@ class UsersTest(unittest.TestCase):
         json = response.get_json()
         print(json)
         self.assertEqual(response.status_code, 400)
-        expected_error = {'detail': 'The phone already exist',
+        expected_error = {'detail': 'Old password error',
                           'status': 400,
                           'title': 'Bad Request',
                           'type': 'about:blank'}
         self.assertDictEqual(json, expected_error)
 
+    """
+    inserire test su get_user_contacts
+    
+    """
+
+    """
+    da cambiare
+    """
     def test_z_delete_user(self):
         client = self.app.test_client()
         response = client.delete('/users/1')

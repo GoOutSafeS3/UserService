@@ -3,3 +3,5 @@ Flask
 flask
 flask-sqlalchemy
 pytest
+coverage
+requests_mock
