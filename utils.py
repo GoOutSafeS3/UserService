@@ -6,7 +6,7 @@ def add_user(firstname, lastname, email, password, phone, dateofbirth, ssn=None,
     new_user = User()
     try:
         new_user.firstname = firstname
-        new_user.lastname =lastname
+        new_user.lastname = lastname
         new_user.email = email
         new_user.set_password(password=password)
         new_user.phone = phone
@@ -22,9 +22,9 @@ def add_user(firstname, lastname, email, password, phone, dateofbirth, ssn=None,
         db.session.add(new_user)
         db.session.commit()
         return new_user.to_json()
-    except:
+    except: # pragma : no cover
         db.session.rollback()
-        return Error500("Server error, try again").get()
+        return Error500().get()
 
 
 def delete_user_(user_id):
@@ -40,6 +40,6 @@ def delete_user_(user_id):
             "status": 201,
             "detail": '',
         }, 201
-    except: # pragma : no cover
+    except:  # pragma : no cover
         db.session.rollback()
-        return Error500("Server error, try again").get()
+        return Error500().get()

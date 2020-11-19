@@ -11,7 +11,7 @@ paths:
     get:
       tags:
       - Users
-      summary: Get the User contacts
+      summary: Get the User contacts, from the begin date to the end date
       operationId: api.get_user_contacts
       parameters:
       - in: path
@@ -19,6 +19,18 @@ paths:
         description: User's unique identifier
         schema:
           type: integer
+      - in: query
+        name: begin
+        description: The beginning of the research period
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: end
+        schema:
+          type: string
+          format: date-time
+        description: The end of the research period
       responses:
         200:
           description: Return all contacts
@@ -30,6 +42,12 @@ paths:
                   $ref: '#/components/schemas/User'
         404:
           description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        400:
+          description: Bad request
           content:
             application/json:
               schema:
