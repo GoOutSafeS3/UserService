@@ -10,7 +10,7 @@ def fake_data():
     add_user("Admin", "Admin", "admin@example.com", "admin", "46966711", birth, is_admin=True)
     add_user("Operatore", "Verdi", "operator@example.com", "operator", "46338411", birth, is_operator=True)
     add_user("Anna", "Rossi", "anna@example.com", "anna", "46968411", birth, ssn="ANNASSN4791DFGYU")
-
+    add_user("Giulia", "Nani", "nani@example.com", "nani", "3939675681", birth)
 
 def create_app(conf=None):
     logging.basicConfig(level=logging.INFO)

@@ -98,7 +98,6 @@ def edit_user(user_id):
     checked = check_password_hash(user.password, req['old_password'])
 
     if checked:
-
         if req['password'] != req['password_repeat']:
             return Error400("Passwords do not match").get()
 
@@ -106,6 +105,7 @@ def edit_user(user_id):
         if user_email is not None:
             if user_email.id != user_id:
                 return Error400("The email already exist").get()
+
         user_phone = db.session.query(User).filter_by(phone=req['phone']).first()
         if user_phone is not None:
             if user_phone.id != user_id:
@@ -118,7 +118,7 @@ def edit_user(user_id):
             user.dateofbirth = datetime.datetime.strptime(dateofbirth[:10], '%Y-%m-%d')
             user.set_password(req['password'])
             user.phone = req['phone']
-            if req['is_positive'] == 'True':
+            if req['is_positive']:
                 user.is_positive = True
                 user.positive_datetime = datetime.datetime.today()
             if req['ssn'] == '':
@@ -128,6 +128,8 @@ def edit_user(user_id):
                 if user_ssn is not None and user_ssn.id != user_id:
                     return Error400("The ssn already exist").get()
                 user.ssn = req['ssn']
+            if user.is_operator and req['rest_id']!='None':
+                user.rest_id = int(req['rest_id'])
             db.session.commit()
         except:
             db.session.rollback()
@@ -138,13 +140,62 @@ def edit_user(user_id):
 
 
 def delete_user(user_id):
-    """
-    inserire controllo email e password
-    e che non sia positivo
+    req = request.json
+    users = db.session.query(User)
+    try:
+        email_param = req['email']
+        pass_hash = req['password']
+    except:
+        return Error400().get()
 
-    controllare se e' operatore e ha ristorante con prenotazioni
-    """
-    return delete_user_(user_id)
+    user = users.filter_by(id=user_id).first()
+    if user is None:
+        return Error404('User not found').get()
+
+    user = users.filter_by(email=email_param,id=user_id).first()
+    if user is None:
+        return Error400('Incorrect email').get()
+
+    if pass_hash != user.password:
+        return Error400("Incorrect password").get()
+
+    if user.is_positive is True: # if the user is Covid-19 positive he can not delete his data
+        return Error400("You cannot delete your data as long as you are positive").get()
+
+    if user.is_operator and user.rest_id is not None:
+        try:   # get the restaurants's bookings
+            reply = requests.get(URL_BOOKINGS + '/bookings', timeout=TIMEOUT, params={'rest_id': user.rest_id,
+                                                                                      'begin': datetime.datetime.today()})
+        except:  # exception on getting the bookings
+            return Error400("Error during restaurant booking request, Try again").get()
+        if reply.status_code == 200:
+            bookings = reply.json()
+        else:
+            return Error400("Booking Service error, Try again").get()
+        if bookings:
+            return Error400("you cannot delete the account if you have active reservations in your restaurant").get()
+        else:
+            try:
+                reply = requests.delete(URL_RESTAURANTS +'/restaurants/' + user.rest_id, timeout=TIMEOUT)
+            except:
+                return Error400("Error during delete restaurant request, Try again").get()
+            if reply.status_code != 200:
+                return Error400("Restaurant Service error, Try again").get()
+
+    else:  # the user is not operator
+        # checking if the user has active bookings
+        try:   # get the user's bookings
+            reply = requests.get(URL_BOOKINGS + '/bookings', timeout=TIMEOUT, params={'user_id': user_id, 'begin': datetime.datetime.today()})
+        except:  # exception on getting the bookings
+            return Error400("Error during restaurant booking request, Try again").get()
+        if reply.status_code == 200:
+            bookings = reply.json()
+        else:
+            return Error400("Booking Service error, Try again").get()
+        if bookings:
+            return Error400("you cannot delete the account if you have active reservations").get()
+
+    return delete_user_(user)
 
 
 def get_user_contacts(user_id, begin=None, end=None):

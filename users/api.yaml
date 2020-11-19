@@ -158,7 +158,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-
         400:
           description: Bad request
           content:
@@ -225,9 +224,20 @@ paths:
           required: true
           schema:
             type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteUser'
       responses:
         204:
           description: User deleted successfully
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         404:
           description: User not found
           content:
@@ -263,6 +273,29 @@ components:
           type: string
           description: Error description
           example: None is not of type 'string'
+    DeleteUser:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        id:
+          type: integer
+          description: Unique User's identifier
+          readOnly: true
+          example: 122
+        email:
+          maxLength: 50
+          minLength: 5
+          type: string
+          description: User's email
+          example: "Anna@example.com"
+        password:
+          maxLength: 100
+          minLength: 3
+          type: string
+          description: User's password
+          example: "xxx"
     User:
       type: object
       required:
@@ -278,6 +311,10 @@ components:
           type: integer
           description: Unique User's identifier
           readOnly: true
+          example: 122
+        rest_id:
+          type: integer
+          description: Restaurant's identifier
           example: 122
         email:
           maxLength: 50

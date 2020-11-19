@@ -9,6 +9,7 @@ db = SQLAlchemy()
 class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    rest_id = db.Column(db.Integer)
     email = db.Column(db.Unicode(128), nullable=False, unique=True)
     firstname = db.Column(db.Unicode(128))
     lastname = db.Column(db.Unicode(128))
@@ -36,7 +37,8 @@ class User(db.Model):
         return self._authenticated
 
     def authenticate(self, password):
-        checked = check_password_hash(self.password, password)
+        checked = check_p
+        assword_hash(self.password, password)
         self._authenticated = checked
         return self._authenticated
 
@@ -49,7 +51,7 @@ class User(db.Model):
                      'email', 'phone', 'ssn',
                      'dateofbirth', 'is_active','is_anonymous',
                      'is_admin', 'is_health_authority','is_operator',
-                     'password',
+                     'password','is_positive',
                      'positive_datetime'):
             js[attr] = getattr(self, attr)
         return js

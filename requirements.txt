@@ -5,3 +5,4 @@ flask-sqlalchemy
 pytest
 coverage
 requests_mock
+pytest-cov

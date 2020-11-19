@@ -1,8 +1,9 @@
 from database import User, db
-from errors import Error500, Error404
+from errors import Error500
 
 
-def add_user(firstname, lastname, email, password, phone, dateofbirth, ssn=None, is_health=None, is_operator=None, is_admin=None):
+def add_user(firstname, lastname, email, password, phone, dateofbirth,
+             rest_id=None, ssn=None, is_health=None, is_operator=None, is_admin=None):
     new_user = User()
     try:
         new_user.firstname = firstname
@@ -19,6 +20,8 @@ def add_user(firstname, lastname, email, password, phone, dateofbirth, ssn=None,
             new_user.is_operator = is_operator
         if is_admin is not None and is_health is None and is_operator is None:
             new_user.is_admin = is_admin
+        if rest_id is not None:
+            new_user.rest_id = rest_id
         db.session.add(new_user)
         db.session.commit()
         return new_user.to_json()
@@ -27,15 +30,12 @@ def add_user(firstname, lastname, email, password, phone, dateofbirth, ssn=None,
         return Error500().get()
 
 
-def delete_user_(user_id):
-    user = db.session.query(User).filter(User.id == user_id).first()
-    if user is None:
-        return Error404("User not found").get()
+def delete_user_(user):
     try:
         db.session.delete(user)
         db.session.commit()
         return {
-            "type": 'success delete',
+            "type": 'Success delete',
             "title": 'user deleted successfully',
             "status": 201,
             "detail": '',
