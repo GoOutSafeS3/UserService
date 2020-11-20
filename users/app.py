@@ -12,6 +12,7 @@ def fake_data():
     add_user("Anna", "Rossi", "anna@example.com", "anna", "46968411", birth, ssn="ANNASSN4791DFGYU")
     add_user("Giulia", "Nani", "nani@example.com", "nani", "3939675681", birth)
 
+
 def create_app(conf=None):
     logging.basicConfig(level=logging.INFO)
     app = connexion.App(__name__)
