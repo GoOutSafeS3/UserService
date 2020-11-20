@@ -89,7 +89,7 @@ def create_user(dict_user):
 
 
 def edit_user(user_id, dict_user):
-    url = USER_SERVICE + '/users'+str(user_id)
+    url = USER_SERVICE + '/users/'+str(user_id)
     return _put(url=url, json=dict_user)
 
 
