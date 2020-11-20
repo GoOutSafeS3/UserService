@@ -95,69 +95,49 @@ def edit_user(user_id):
     if not user:
         return Error404("User not found").get()
 
-    checked = check_password_hash(user.password, req['old_password'])
+    user_email = db.session.query(User).filter_by(email=req['email']).first()
+    if user_email is not None:
+        if user_email.id != user_id:
+            return Error400("The email already exist").get()
 
-    if checked:
-        if req['password'] != req['password_repeat']:
-            return Error400("Passwords do not match").get()
+    user_phone = db.session.query(User).filter_by(phone=req['phone']).first()
+    if user_phone is not None:
+        if user_phone.id != user_id:
+            return Error400("The phone already exist").get()
+    try:
+        user.firstname = req['firstname']
+        user.lastname = req['lastname']
+        user.email = req['email']
+        dateofbirth = req['dateofbirth']
+        user.dateofbirth = datetime.datetime.strptime(dateofbirth[:10], '%Y-%m-%d')
+        user.set_password(req['password'])
+        user.phone = req['phone']
+        if req['is_positive']:
+            user.is_positive = True
+            user.positive_datetime = datetime.datetime.today()
+        if req['ssn'] == '':
+            user.ssn = None
+        else:
+            user_ssn = db.session.query(User).filter_by(ssn=req['ssn']).first()
+            if user_ssn is not None and user_ssn.id != user_id:
+                return Error400("The ssn already exist").get()
+            user.ssn = req['ssn']
+        if user.is_operator and req['rest_id']!='None':
+            user.rest_id = int(req['rest_id'])
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return Error500().get()
 
-        user_email = db.session.query(User).filter_by(email=req['email']).first()
-        if user_email is not None:
-            if user_email.id != user_id:
-                return Error400("The email already exist").get()
-
-        user_phone = db.session.query(User).filter_by(phone=req['phone']).first()
-        if user_phone is not None:
-            if user_phone.id != user_id:
-                return Error400("The phone already exist").get()
-        try:
-            user.firstname = req['firstname']
-            user.lastname = req['lastname']
-            user.email = req['email']
-            dateofbirth = req['dateofbirth']
-            user.dateofbirth = datetime.datetime.strptime(dateofbirth[:10], '%Y-%m-%d')
-            user.set_password(req['password'])
-            user.phone = req['phone']
-            if req['is_positive']:
-                user.is_positive = True
-                user.positive_datetime = datetime.datetime.today()
-            if req['ssn'] == '':
-                user.ssn = None
-            else:
-                user_ssn = db.session.query(User).filter_by(ssn=req['ssn']).first()
-                if user_ssn is not None and user_ssn.id != user_id:
-                    return Error400("The ssn already exist").get()
-                user.ssn = req['ssn']
-            if user.is_operator and req['rest_id']!='None':
-                user.rest_id = int(req['rest_id'])
-            db.session.commit()
-        except:
-            db.session.rollback()
-            return Error500().get()
-    else:
-        return Error400("Old password error").get()
     return user.to_json()
 
 
 def delete_user(user_id):
     req = request.json
     users = db.session.query(User)
-    try:
-        email_param = req['email']
-        pass_hash = req['password']
-    except:
-        return Error400().get()
-
     user = users.filter_by(id=user_id).first()
     if user is None:
         return Error404('User not found').get()
-
-    user = users.filter_by(email=email_param,id=user_id).first()
-    if user is None:
-        return Error400('Incorrect email').get()
-
-    if pass_hash != user.password:
-        return Error400("Incorrect password").get()
 
     if user.is_positive is True: # if the user is Covid-19 positive he can not delete his data
         return Error400("You cannot delete your data as long as you are positive").get()

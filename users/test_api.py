@@ -113,6 +113,7 @@ class UsersTest(unittest.TestCase):
     def test_edit_user_mark(self):
         client = self.app.test_client()
         modify_user = {
+            'id':3,
             'firstname': 'Anna',
             'lastname': 'Rossi',
             'email': "anna@example.com",
@@ -134,6 +135,7 @@ class UsersTest(unittest.TestCase):
     def test_edit_user400email(self):
         client = self.app.test_client()
         modify_user = {
+            'id': 1,
             'firstname': 'Admin',
             'lastname': 'Rossi',
             'email': "anna@example.com",
@@ -157,6 +159,7 @@ class UsersTest(unittest.TestCase):
     def test_edit_user400ssn(self):
         client = self.app.test_client()
         modify_user = {
+            'id': 2,
             'firstname': 'Giada',
             'lastname': 'Verdi',
             'email': "giada@example.com",
@@ -181,6 +184,7 @@ class UsersTest(unittest.TestCase):
     def test_edit_user400phone(self):
         client = self.app.test_client()
         modify_user = {
+            'id': 2,
             'firstname': 'Giada',
             'lastname': 'Verdi',
             'email': "giada@example.com",
@@ -200,29 +204,6 @@ class UsersTest(unittest.TestCase):
                           'type': 'about:blank'}
         self.assertDictEqual(json, expected_error)
 
-    def test_edit_user_400old_pw(self):
-        client = self.app.test_client()
-        modify_user = {
-            'firstname': 'Giada',
-            'lastname': 'Verdi',
-            'email': "giada@example.com",
-            'old_password': "errata",
-            'password': "anna",
-            'password_repeat': "anna",
-            'phone': "46968411",
-            'dateofbirth': "1990-11-11",
-            'is_positive': True,
-        }
-        response = client.put('/users/2', json=modify_user)
-        json = response.get_json()
-        print(json)
-        self.assertEqual(response.status_code, 400)
-        expected_error = {'detail': 'Old password error',
-                          'status': 400,
-                          'title': 'Bad Request',
-                          'type': 'about:blank'}
-        self.assertDictEqual(json, expected_error)
-
     """
     inserire test su get_user_contacts
     
@@ -230,11 +211,6 @@ class UsersTest(unittest.TestCase):
 
     def test_z_delete_user(self):
         client = self.app.test_client()
-        # --------------------------------------------
-        # TEST DELETE USER without email and password
-        # --------------------------------------------
-        response = client.delete('/users/1')
-        self.assertEqual(response.status_code, 400)
         # --------------------------------------------
         # TEST DELETE USER user not found
         # --------------------------------------------
@@ -251,38 +227,10 @@ class UsersTest(unittest.TestCase):
                           'type': 'about:blank'}
         self.assertDictEqual(json, expected_error)
         # --------------------------------------------
-        # TEST DELETE USER incorrect email
-        # --------------------------------------------
-        json = {
-            'email': "errata@example.com",
-            'password': "anna"
-        }
-        response = client.delete('/users/1', json=json)
-        self.assertEqual(response.status_code, 400)
-        expected_error = {'detail': 'Incorrect email',
-                          'status': 400,
-                          'title': 'Bad Request',
-                          'type': 'about:blank'}
-        self.assertDictEqual(response.get_json(), expected_error)
-        # --------------------------------------------
-        # TEST DELETE USER incorrect password
-        # --------------------------------------------
-        json = {
-            'email': "admin@example.com",
-            'password': "annabelle"
-        }
-        response = client.delete('/users/1', json=json)
-        self.assertEqual(response.status_code, 400)
-        expected_error = {'detail': 'Incorrect password',
-                          'status': 400,
-                          'title': 'Bad Request',
-                          'type': 'about:blank'}
-        json = response.get_json()
-        self.assertDictEqual(json, expected_error)
-        # --------------------------------------------
         # TEST DELETE USER cannot delete data until positive
         # --------------------------------------------
         modify_user = {
+            'id': 3,
             'firstname': 'Anna',
             'lastname': 'Rossi',
             'email': "anna@example.com",
@@ -298,12 +246,7 @@ class UsersTest(unittest.TestCase):
         json1 = r.get_json()
         self.assertEqual(r.status_code, 200, msg=json1)
         response = client.get('/users/3')
-        response = response.get_json()
-        json = {
-            'email': response['email'],
-            'password': response['password']
-        }
-        response1 = client.delete('/users/3', json=json)
+        response1 = client.delete('/users/3')
         self.assertEqual(response1.status_code, 400)
         expected_error = {'detail': 'You cannot delete your data as long as you are positive',
                           'status': 400,
