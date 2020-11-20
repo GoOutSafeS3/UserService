@@ -1,5 +1,5 @@
 import unittest
-from app import create_app
+from users.app import create_app
 
 
 class UsersTest(unittest.TestCase):
@@ -254,9 +254,6 @@ class UsersTest(unittest.TestCase):
                           'type': 'about:blank'}
         json2 = response1.get_json()
         self.assertDictEqual(json2, expected_error)
-        # --------------------------------------------
-        # TEST DELETE USER 201
-        # --------------------------------------------
 
 
 if __name__ == '__main__':

@@ -1,0 +1,17 @@
+version: '3'
+services:
+  bookings:
+    build: .
+    environment:
+      - "CONFIG=TEST"
+
+  nginx:
+    image: nginx
+    build:
+      context : ./nginx/
+      dockerfile: nginx.dockerfile
+    depends_on:
+      - users
+    restart: always
+    ports:
+      - "80:80"

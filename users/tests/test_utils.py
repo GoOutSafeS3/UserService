@@ -1,8 +1,8 @@
 import datetime
 import unittest
-from database import User
-from utils import add_user
-from app import create_app
+from users.database import User
+from users.utils import add_user
+from users.app import create_app
 
 
 class UsersUtils(unittest.TestCase):

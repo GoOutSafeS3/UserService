@@ -1,10 +1,10 @@
 import datetime
-from flask import request, jsonify
-from werkzeug.security import check_password_hash
+from flask import request, jsonify, current_app
 import requests
-from database import db, User
-from errors import Error500, Error404, Error400
-from utils import add_user, delete_user_
+from users.database import db, User
+from users.errors import Error500, Error404, Error400
+from users.utils import add_user, delete_user_, get_from, delete_from, bookings_mock
+from users.utils import restaurants_mock
 
 URL_BOOKINGS = 'http://127.0.0.1:8080'
 URL_RESTAURANTS = "http://127.0.0.1:8079"
@@ -122,7 +122,7 @@ def edit_user(user_id):
             if user_ssn is not None and user_ssn.id != user_id:
                 return Error400("The ssn already exist").get()
             user.ssn = req['ssn']
-        if user.is_operator and req['rest_id']!='None':
+        if user.is_operator and req['rest_id'] != 'None':
             user.rest_id = int(req['rest_id'])
         db.session.commit()
     except:
@@ -133,47 +133,49 @@ def edit_user(user_id):
 
 
 def delete_user(user_id):
-    req = request.json
-    users = db.session.query(User)
-    user = users.filter_by(id=user_id).first()
+    user = db.session.query(User).filter_by(id=user_id).first()
     if user is None:
         return Error404('User not found').get()
 
-    if user.is_positive is True: # if the user is Covid-19 positive he can not delete his data
+    if user.is_positive is True:  # if the user is Covid-19 positive he can not delete his data
         return Error400("You cannot delete your data as long as you are positive").get()
 
-    if user.is_operator and user.rest_id is not None:
-        try:   # get the restaurants's bookings
-            reply = requests.get(URL_BOOKINGS + '/bookings', timeout=TIMEOUT, params={'rest_id': user.rest_id,
-                                                                                      'begin': datetime.datetime.today()})
-        except:  # exception on getting the bookings
-            return Error400("Error during restaurant booking request, Try again").get()
-        if reply.status_code == 200:
-            bookings = reply.json()
+    with current_app.app_context():
+        if current_app.config["USE_MOCKS"]:
+            return { }
         else:
-            return Error400("Booking Service error, Try again").get()
-        if bookings:
-            return Error400("you cannot delete the account if you have active reservations in your restaurant").get()
-        else:
-            try:
-                reply = requests.delete(URL_RESTAURANTS +'/restaurants/' + user.rest_id, timeout=TIMEOUT)
-            except:
-                return Error400("Error during delete restaurant request, Try again").get()
-            if reply.status_code != 200:
-                return Error400("Restaurant Service error, Try again").get()
+            if user.is_operator and user.rest_id is not None:  # the user is operator with restaurant
 
-    else:  # the user is not operator
-        # checking if the user has active bookings
-        try:   # get the user's bookings
-            reply = requests.get(URL_BOOKINGS + '/bookings', timeout=TIMEOUT, params={'user_id': user_id, 'begin': datetime.datetime.today()})
-        except:  # exception on getting the bookings
-            return Error400("Error during restaurant booking request, Try again").get()
-        if reply.status_code == 200:
-            bookings = reply.json()
-        else:
-            return Error400("Booking Service error, Try again").get()
-        if bookings:
-            return Error400("you cannot delete the account if you have active reservations").get()
+                url = URL_BOOKINGS + '/bookings'
+                params = {'rest_id': user.rest_id,
+                          'begin': datetime.datetime.today()}
+                bookings = get_from(url, params)
+                if bookings.status_code == 200:
+                    bookings = bookings.json()
+                else:
+                    return Error400('BookingService error').get()
+                if bookings:
+                    return Error400(
+                        "you cannot delete the account if you have active reservations in your restaurant").get()
+                else:
+                    url = URL_RESTAURANTS + '/restaurants/' + user.rest_id
+                    resp = delete_from(url)  # return a response
+                    if resp.status_code == 200 or resp.status_code == 201:
+                        return delete_user_(user)
+                    else:
+                        return Error400('Error on try to delete the restaurant').get()
+
+            else:  # the user is not operator
+
+                params = {'user_id': user_id, 'begin': datetime.datetime.today()}
+                url = URL_BOOKINGS + '/bookings'
+                bookings = get_from(url=url, params=params)
+                if bookings.status_code == 200:
+                    bookings = bookings.json()
+                else:
+                    return Error400('BookingService error').get()
+                if bookings:
+                    return Error400("you cannot delete the account if you have active reservations").get()
 
     return delete_user_(user)
 
@@ -188,49 +190,47 @@ def get_user_contacts(user_id, begin=None, end=None):
     user = db.session.query(User).filter(User.id == user_id).first()
     if user is None:
         return Error404("User not found").get()
-    try:  # get the user's bookings
-        reply = requests.get(URL_BOOKINGS + '/bookings', timeout=TIMEOUT, params={'user_id': user_id,
-                                                                                  'begin': begin,
-                                                                                  'end': end})
-    except:  # exception on getting the user's bookings
-        return Error400("Error during user booking request, Try again").get()
-    if reply.status_code == 200:
-        bookings = reply.json()
-    else:
-        return Error400("Booking Service error, Try again").get()
-    for booking in bookings:
-        try:  # get the restaurant of the booking
-            restaurant = requests.get(URL_RESTAURANTS + '/restaurants/' + booking['restaurant_id'], timeout=TIMEOUT)
-            if restaurant.status_code == 200:
-                restaurant = restaurant.json()
+    with current_app.app_context():
+        if current_app.config["USE_MOCKS"]:
+            pass
+        else:
+            params = {'user_id': user_id,
+                      'begin': begin,
+                      'end': end}
+            resp = get_from(URL_BOOKINGS + '/bookings', params=params)
+            if resp.status_code == 200:
+                bookings = resp.json()
             else:
-                return Error400("Restaurant Service error, Try again").get()
-        except:  # exception on getting the restaurant of the booking
-            return Error400("Error during restaurant request, Try again").get()
+                return Error400('BookingService error').get()
+            for booking in bookings:
+                restaurant = get_from(URL_RESTAURANTS + '/restaurants/' + booking['restaurant_id'])
+                if restaurant.status_code == 200:
+                    restaurant = restaurant.json()
+                else:
+                    return Error400("Restaurant Service error, Try again").get()
 
-        # get the occupation time of the restaurant
-        interval = datetime.timedelta(hours=restaurant['occupation_time'])
-        end = booking['entrance_datetime'] + interval
-        begin = booking['entrance_datetime'] - interval
+                # get the occupation time of the restaurant
+                interval = datetime.timedelta(hours=restaurant['occupation_time'])
+                end = booking['entrance_datetime'] + interval
+                begin = booking['entrance_datetime'] - interval
 
-        try:  # get the bookings (of the same restaurant) in the occupation time interval
-            contact_bookings = requests.get(URL_BOOKINGS + '/bookings', timeout=TIMEOUT,
+                # get the bookings (of the same restaurant) in the occupation time interval
+                contact_bookings = get_from(URL_BOOKINGS + '/bookings',
                                             params={'restaurant_id': booking['restaurant_id'],
                                                     'begin_entrance': begin,
                                                     'end_entrance': end})
-        except:
-            return Error400("Error during bookings (of the same restaurant) request, Try again").get()
-        if contact_bookings.status_code == 200:
-            contact_bookings = contact_bookings.json()
-        else:
-            return Error400("Booking Service error, Try again").get()
-        for contact in contact_bookings:
-            user_id_contact = contact['user_id']
-            if user_id_contact != user_id:
-                user_contact = db.session.query(User).filter_by(id=user_id_contact).first()
-                if user_contact is not None:
-                    user_contact = user_contact.to_json()
-                    # insert the contact in the list
-                    user_contacts.append(user_contact)
+
+                if contact_bookings.status_code == 200:
+                    contact_bookings = contact_bookings.json()
+                else:
+                    return Error400("Booking Service error, Try again").get()
+                for contact in contact_bookings:
+                    user_id_contact = contact['user_id']
+                    if user_id_contact != user_id:
+                        user_contact = db.session.query(User).filter_by(id=user_id_contact).first()
+                        if user_contact is not None:
+                            user_contact = user_contact.to_json()
+                            # insert the contact in the list
+                            user_contacts.append(user_contact)
 
     return jsonify(user_contacts), 200
