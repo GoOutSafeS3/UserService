@@ -8,7 +8,7 @@ from utils import add_user, delete_user_
 
 URL_BOOKINGS = 'http://127.0.0.1:8080'
 URL_RESTAURANTS = "http://127.0.0.1:8079"
-TIMEOUT = 0.003  # timeout for external get
+TIMEOUT = 2  # timeout for external get
 
 
 def get_users(ssn=None, phone=None, email=None, is_positive=None):
