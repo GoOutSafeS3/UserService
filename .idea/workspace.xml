@@ -20,7 +20,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fce8b112-8b96-44f1-9efd-fc3c8584bde8" name="Default Changelist" comment="">
+<<<<<<< Updated upstream
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+=======
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run.sh" beforeDir="false" afterPath="$PROJECT_DIR$/run.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/api.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/api.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/database.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/errors.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/errors.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/tests/test_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/tests/test_api.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/tests/test_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/tests/test_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/utils.py" afterDir="false" />
+>>>>>>> Stashed changes
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,6 +48,17 @@
       </list>
     </option>
   </component>
+  <component name="FlaskConsoleOptions" custom-start-script="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))">
+    <envs>
+      <env key="FLASK_APP" value="app" />
+    </envs>
+    <option name="myCustomStartScript" value="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))" />
+    <option name="myEnvs">
+      <map>
+        <entry key="FLASK_APP" value="app" />
+      </map>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -45,8 +70,10 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -63,7 +90,9 @@
       <updated>1605878893059</updated>
       <workItem from="1605878894365" duration="8029000" />
       <workItem from="1605889605192" duration="746000" />
-      <workItem from="1605965788653" duration="2381000" />
+      <workItem from="1605965788653" duration="5539000" />
+      <workItem from="1605995319265" duration="1068000" />
+      <workItem from="1605996523806" duration="3761000" />
     </task>
     <servers />
   </component>
@@ -87,9 +116,17 @@
       <screen x="0" y="25" width="1440" height="801" />
     </state>
     <state x="890" y="231" key="#com.intellij.fileTypes.FileTypeChooser/0.25.1440.801@0.25.1440.801" timestamp="1605879716655" />
+    <state x="255" y="61" key="SettingsEditor" timestamp="1605996817445">
+      <screen x="0" y="25" width="1440" height="801" />
+    </state>
+    <state x="255" y="61" key="SettingsEditor/0.25.1440.801@0.25.1440.801" timestamp="1605996817445" />
     <state x="385" y="150" width="670" height="676" key="search.everywhere.popup" timestamp="1605967168279">
       <screen x="0" y="25" width="1440" height="801" />
     </state>
     <state x="385" y="150" width="670" height="676" key="search.everywhere.popup/0.25.1440.801@0.25.1440.801" timestamp="1605967168279" />
+    <state x="476" y="331" key="vcs.readOnlyHandler.ReadOnlyStatusDialog" timestamp="1605996447081">
+      <screen x="0" y="25" width="1440" height="801" />
+    </state>
+    <state x="476" y="331" key="vcs.readOnlyHandler.ReadOnlyStatusDialog/0.25.1440.801@0.25.1440.801" timestamp="1605996447081" />
   </component>
 </project>

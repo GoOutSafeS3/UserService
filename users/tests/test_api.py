@@ -14,6 +14,11 @@ class UsersTest(unittest.TestCase):
         json = response.get_json()
         self.assertEqual(response.status_code, 200, msg=json)
 
+    def test_get_negative_users(self):
+        client = self.app.test_client()
+        response = client.get('/users?is_positive=False')
+        self.assertEqual(response.status_code, 200)
+
     def test_get_users_by_email(self):
         client = self.app.test_client()
         users = {}
@@ -45,7 +50,7 @@ class UsersTest(unittest.TestCase):
         json = response.get_json()
         self.assertEqual(response.status_code, 200, msg=json)
 
-        response = client.get('/users?ssn=468333331', json=users)
+        response = client.get('/users?phone=468333331', json=users)
         self.assertEqual(response.status_code, 404)
 
     def test_get_user_id(self):
@@ -66,7 +71,10 @@ class UsersTest(unittest.TestCase):
             'firstname': 'Nuovo',
             'lastname': 'Utente',
             'phone': '345141451',
-            'dateofbirth': '1990-10-10'
+            'dateofbirth': '1990-10-10',
+            'is_admin': False,
+            'is_operator':False,
+            'is_health_authority':False
         }
         response = client.post('/users', json=new_user)
         json = response.get_json()
@@ -78,7 +86,10 @@ class UsersTest(unittest.TestCase):
             'firstname': 'Nuovo1',
             'lastname': 'Utente1',
             'phone': '345141454',
-            'dateofbirth': '1990-12-12'
+            'dateofbirth': '1990-12-12',
+            'is_admin': False,
+            'is_operator': False,
+            'is_health_authority': False
         }
         response = client.post('/users', json=new_user)
         json = response.get_json()
@@ -91,7 +102,10 @@ class UsersTest(unittest.TestCase):
             'lastname': 'Utente2',
             'phone': '3451414553',
             'dateofbirth': '1990-10-10',
-            'ssn': 'ANNASSN4791DFGYU'
+            'ssn': 'ANNASSN4791DFGYU',
+            'is_admin': False,
+            'is_operator': False,
+            'is_health_authority': False
         }
         response = client.post('/users', json=new_user)
         json = response.get_json()
@@ -104,7 +118,10 @@ class UsersTest(unittest.TestCase):
             'firstname': 'Nuovo2',
             'lastname': 'Utente2',
             'phone': '3451414553',
-            'dateofbirth': '2021-10-10'
+            'dateofbirth': '2021-10-10',
+            'is_admin': False,
+            'is_operator': False,
+            'is_health_authority': False
         }
         response = client.post('/users', json=new_user)
         json = response.get_json()
@@ -131,6 +148,8 @@ class UsersTest(unittest.TestCase):
         response = client.get('/users?is_positive=True')
         json = response.get_json()
         self.assertNotEqual('[]',json)
+        response = client.put('/users/999', json=modify_user)
+        self.assertEqual(response.status_code, 404)
 
     def test_edit_user400email(self):
         client = self.app.test_client()

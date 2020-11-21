@@ -135,4 +135,7 @@ assets/
 
 .users/users.db
 .coverage
-.idea/workspace.xml
+report.html
+htmlcov
+
+.idea/*

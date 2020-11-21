@@ -4,12 +4,15 @@ case "$1" in
     "unittests-report")
         pytest --cov=users --cov-report term-missing --cov-report html --html=report.html
         ;;
+    "unittests-cov")
+        pytest --cov=users --cov-report term-missing
+        ;;
     "unittests")
         pytest --cov=users
         ;;
     "setup")
         pip3 install -r requirements.txt
-        pip3 install pytest pytest-cov
+        pip3 install pytest-cov
         pip3 install pytest-html
         ;;
     "docker-build")

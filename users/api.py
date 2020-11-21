@@ -47,19 +47,15 @@ def create_user():
     lastname = req['lastname']
     email = req['email']
     password = req['password']
-    password_repeat = req['password_repeat']
     phone = req['phone']
     dateofbirth = req['dateofbirth']
     try:
         ssn = req['ssn']
-        is_health = req['is_health_authority']
         is_operator = req['is_operator']
         is_admin = req['is_admin']
+        is_health = req['is_health_authority']
     except:
         pass
-
-    if password != password_repeat:
-        return Error400("Passwords do not match").get()
 
     exist_email = db.session.query(User).filter_by(email=email).first()
     exist_phone = db.session.query(User).filter_by(phone=phone).first()
@@ -112,7 +108,7 @@ def edit_user(user_id):
         user.email = req['email']
         dateofbirth = req['dateofbirth']
         user.dateofbirth = datetime.datetime.strptime(dateofbirth[:10], '%Y-%m-%d')
-        user.set_password(req['password'])
+        user.password = req['password']
         user.phone = req['phone']
         if req['is_positive']:
             user.is_positive = True
@@ -151,18 +147,15 @@ def delete_user(user_id):
                 url = URL_BOOKINGS + '/bookings'
                 params = {'rest_id': user.rest_id,
                           'begin': datetime.datetime.today()}
-                bookings = get_from(url, params)
-                if bookings.status_code == 200:
-                    bookings = bookings.json()
-                else:
+                bookings, status_code = get_from(url, params)
+                if status_code != 200:
                     return Error400('BookingService error').get()
                 if bookings:
-                    return Error400(
-                        "you cannot delete the account if you have active reservations in your restaurant").get()
+                    return Error400("you cannot delete the account if you have active reservations in your restaurant").get()
                 else:
                     url = URL_RESTAURANTS + '/restaurants/' + user.rest_id
-                    resp = delete_from(url)  # return a response
-                    if resp.status_code == 200 or resp.status_code == 201:
+                    resp, status_code = delete_from(url)  # return a response
+                    if status_code == 200 or status_code == 201:
                         return delete_user_(user)
                     else:
                         return Error400('Error on try to delete the restaurant').get()
@@ -171,10 +164,8 @@ def delete_user(user_id):
 
                 params = {'user_id': user_id, 'begin': datetime.datetime.today()}
                 url = URL_BOOKINGS + '/bookings'
-                bookings = get_from(url=url, params=params)
-                if bookings.status_code == 200:
-                    bookings = bookings.json()
-                else:
+                bookings,status_code = get_from(url=url, params=params)
+                if status_code != 200:
                     return Error400('BookingService error').get()
                 if bookings:
                     return Error400("you cannot delete the account if you have active reservations").get()
@@ -199,16 +190,12 @@ def get_user_contacts(user_id, begin=None, end=None):
             params = {'user_id': user_id,
                       'begin': begin,
                       'end': end}
-            resp = get_from(URL_BOOKINGS + '/bookings', params=params)
-            if resp.status_code == 200:
-                bookings = resp.json()
-            else:
+            bookings, status_code = get_from(URL_BOOKINGS + '/bookings', params=params)
+            if status_code != 200:
                 return Error400('BookingService error').get()
             for booking in bookings:
-                restaurant = get_from(URL_RESTAURANTS + '/restaurants/' + booking['restaurant_id'])
-                if restaurant.status_code == 200:
-                    restaurant = restaurant.json()
-                else:
+                restaurant, status_code = get_from(URL_RESTAURANTS + '/restaurants/' + booking['restaurant_id'])
+                if status_code != 200:
                     return Error400("Restaurant Service error, Try again").get()
 
                 # get the occupation time of the restaurant
@@ -217,14 +204,12 @@ def get_user_contacts(user_id, begin=None, end=None):
                 begin = booking['entrance_datetime'] - interval
 
                 # get the bookings (of the same restaurant) in the occupation time interval
-                contact_bookings = get_from(URL_BOOKINGS + '/bookings',
+                contact_bookings, status_code = get_from(URL_BOOKINGS + '/bookings',
                                             params={'restaurant_id': booking['restaurant_id'],
                                                     'begin_entrance': begin,
                                                     'end_entrance': end})
 
-                if contact_bookings.status_code == 200:
-                    contact_bookings = contact_bookings.json()
-                else:
+                if status_code != 200:
                     return Error400("Booking Service error, Try again").get()
                 for contact in contact_bookings:
                     user_id_contact = contact['user_id']

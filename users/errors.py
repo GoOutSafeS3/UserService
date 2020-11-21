@@ -12,10 +12,10 @@ A error object has 4 properties:
 class Error:
     def __init__(self, type, title, status, detail):
         """ General error """
-        self.type = type
-        self.title = title
-        self.status = status
-        self.detail = detail
+        self.type = type # pragma: no cover
+        self.title = title # pragma: no cover
+        self.status = status # pragma: no cover
+        self.detail = detail # pragma: no cover
 
     def get(self):
         """ Returns the pair (json, status_code) """
@@ -53,7 +53,7 @@ class Error500(Error):
 
         It is usually accompanied by a notification to the user asking her to try again
         """
-        self.type = "about:blank"
-        self.title = "Internal Server Error"
-        self.status = 500
-        self.detail = "An error occured, please try again"
+        self.type = "about:blank" # pragma: no cover
+        self.title = "Internal Server Error" # pragma: no cover
+        self.status = 500 # pragma: no cover
+        self.detail = "An error occured, please try again" # pragma: no cover

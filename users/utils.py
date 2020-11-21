@@ -1,7 +1,6 @@
 import datetime
-
 from flask import current_app
-import requests
+import requests as req
 from users.database import User, db
 from users.errors import Error500, Error400
 
@@ -110,25 +109,49 @@ tables = [
 # --------------------------SERVICES UTILITY FUNCTIONS----------------------------
 #
 
-def get_from(url,params=None):
+def get_from(url, params=None):
     try:
-        with current_app.app_context():
-            if params is not None:
-                r = requests.get(url, timeout=current_app.config["TIMEOUT"], params=params)
-            else:
-                r = requests.get(url, timeout=current_app.config["TIMEOUT"])
-            return r
+        if params is not None:
+            r = req.get(url, timeout=2, params=params)
+        else:
+            r = req.get(url, timeout=2)
+        try:
+            return r.json(), r.status_code
+        except:
+            return {
+                       "type": "about:blank",
+                       "title": "Unexpected Error",
+                       "status": r.status_code,
+                       "detail": "Unexpected error occurs",
+                   }, r.status_code
     except:
-        return Error400("Error during url request, Try again").get()
+        return {
+                   "type": "about:blank",
+                   "title": "Internal Server Error",
+                   "status": 500,
+                   "detail": "Error during communication with other services",
+               }, 500
 
 
 def delete_from(url):
     try:
-        with current_app.app_context():
-            r = requests.delete(url, timeout=current_app.config["TIMEOUT"])
-            return r
+        r = req.delete(url, timeout=current_app.config["TIMEOUT"])
+        try:
+            return r.json(), r.status_code
+        except:
+            return {
+                       "type": "about:blank",
+                       "title": "Unexpected Error",
+                       "status": r.status_code,
+                       "detail": "Unexpected error occurs",
+                   }, r.status_code
     except:
-        return Error400("Error during url request, Try again").get()
+        return {
+                   "type": "about:blank",
+                   "title": "Internal Server Error",
+                   "status": 500,
+                   "detail": "Error during communication with other services",
+               }, 500
 
 #
 # -----------------------------------------------------------------------------------
@@ -142,7 +165,7 @@ def add_user(firstname, lastname, email, password, phone, dateofbirth,
         new_user.firstname = firstname
         new_user.lastname = lastname
         new_user.email = email
-        new_user.set_password(password=password)
+        new_user.password = password
         new_user.phone = phone
         new_user.dateofbirth = dateofbirth
         new_user.is_positive = False

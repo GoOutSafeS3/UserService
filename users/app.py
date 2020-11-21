@@ -63,7 +63,7 @@ def get_config(configuration=None):
         if parser.read('config.ini'):
 
             if type(configuration) != str:  # if it's not a string, take the default one
-                configuration = parser["CONFIG"]["CONFIG"]
+                configuration = parser["CONFIG"]["CONFIG"] # pragma: no cover
 
             logging.info("- GoOutSafe: Users CONFIGURATION: %s", configuration)
             configuration = parser._sections[configuration]  # get the configuration data
@@ -90,7 +90,7 @@ def get_config(configuration=None):
             return parsed_configuration
         else:
             return DEFAULT_CONFIGURATION
-    except Exception as e:
+    except Exception as e: # pragma: no cover
         logging.info("- GoOutSafe: Users CONFIGURATION ERROR: %s", e)
         logging.info("- GoOutSafe: Users RUNNING: Default Configuration")
         return DEFAULT_CONFIGURATION
@@ -100,7 +100,7 @@ def setup(application, config):
     if config["REMOVE_DB"]:  # remove the db file
         try:
             os.remove("bookings/" + config["SQLALCHEMY_DATABASE_URI"])
-            logging.info("- GoOutSafe: Users Database Removed")
+            logging.info("- GoOutSafe: Users Database Removed") # pragma: no cover
         except:
             pass
 

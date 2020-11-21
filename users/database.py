@@ -25,26 +25,6 @@ class User(db.Model):
     is_positive = db.Column(db.Boolean, default=False)
     positive_datetime = db.Column(db.DateTime)
 
-    def __init__(self, *args, **kw):
-        super(User, self).__init__(*args, **kw)
-        self._authenticated = False
-
-    def set_password(self, password):
-        self.password = generate_password_hash(password)
-
-    @property
-    def is_authenticated(self):
-        return self._authenticated
-
-    def authenticate(self, password):
-        checked = check_p
-        assword_hash(self.password, password)
-        self._authenticated = checked
-        return self._authenticated
-
-    def get_id(self):
-        return self.id
-
     def to_json(self):
         js = {}
         for attr in ('id', 'firstname', 'lastname',
