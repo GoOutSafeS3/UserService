@@ -1,3 +1,5 @@
+import datetime
+
 from flask import current_app
 import requests
 from users.database import User, db
@@ -143,6 +145,7 @@ def add_user(firstname, lastname, email, password, phone, dateofbirth,
         new_user.set_password(password=password)
         new_user.phone = phone
         new_user.dateofbirth = dateofbirth
+        new_user.is_positive = False
         if ssn is not None:
             new_user.ssn = ssn
         if is_health is not None and is_operator is None and is_admin is None:
@@ -174,3 +177,16 @@ def delete_user_(user):
     except:  # pragma : no cover
         db.session.rollback()
         return Error500().get()
+
+
+def mark_positive_user(id_user):
+    user = db.session.query(User).filter_by(id=id_user).first()
+    if user is not None:
+        try:
+            user.is_positive = True
+            user.positive_datetime = datetime.datetime.today()
+            db.session.commit()
+            return True
+        except:  # pragma : no cover
+            db.session.rollback()
+            return False

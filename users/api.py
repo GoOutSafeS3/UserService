@@ -16,6 +16,8 @@ def get_users(ssn=None, phone=None, email=None, is_positive=None):
     if is_positive is not None:
         if is_positive == 'True':
             users = users.filter_by(is_positive=True).all()
+        elif is_positive == 'False':
+            users = users.filter_by(is_positive=False).all()
     if ssn is not None:
         user = users.filter_by(ssn=ssn).first()
         if user is None:

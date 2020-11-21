@@ -136,7 +136,7 @@ class UsersTest(unittest.TestCase):
         client = self.app.test_client()
         modify_user = {
             'id': 1,
-            'firstname': 'Admin',
+            'firstname': 'Gianni',
             'lastname': 'Rossi',
             'email': "anna@example.com",
             'old_password': "admin",
@@ -160,9 +160,9 @@ class UsersTest(unittest.TestCase):
         client = self.app.test_client()
         modify_user = {
             'id': 2,
-            'firstname': 'Giada',
+            'firstname': 'Daniele',
             'lastname': 'Verdi',
-            'email': "giada@example.com",
+            'email': "daniele@example.com",
             'old_password': "operator",
             'password': "anna",
             'password_repeat': "anna",

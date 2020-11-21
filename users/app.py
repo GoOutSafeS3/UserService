@@ -5,7 +5,7 @@ import configparser
 import sys
 import os
 from users.database import db
-from users.utils import add_user
+from users.utils import add_user, mark_positive_user
 from flask import current_app
 sys.path.append("./users/")
 
@@ -32,11 +32,19 @@ DEFAULT_CONFIGURATION = {
 
 def fake_data():
     birth = datetime.datetime.today() - datetime.timedelta(weeks=1564)
-    add_user("Admin", "Admin", "admin@example.com", "admin", "46966711", birth, is_admin=True)
-    add_user("Operatore", "Verdi", "operator@example.com", "operator", "46338411", birth, is_operator=True)
+    add_user("Gianni", "Barbuti", "gianni@example.com", "admin", "46966711", birth - datetime.timedelta(weeks=500,days=40))
+    add_user("Daniele", "Verdi", "daniele@example.com", "operator", "46338411", birth - datetime.timedelta(weeks=100,days=4))
     add_user("Anna", "Rossi", "anna@example.com", "anna", "46968411", birth, ssn="ANNASSN4791DFGYU")
-    add_user("Giulia", "Nani", "nani@example.com", "nani", "3939675681", birth)
-
+    add_user("Giulia", "Nani", "nani@example.com", "nani", "3939675681", birth- datetime.timedelta(weeks=100,days=21))
+    add_user("Admin","Admin","admin@example.com","admin","3665479701", (birth - datetime.timedelta(weeks=600,days=10)),is_admin=True)
+    add_user("Health","Authority","health@example.com","health","557692170",birth,is_health=True)
+    add_user('Operator',"Trial",'operator@example.com','operator','3245678432', birth, rest_id=1, is_operator=True)
+    add_user('Operator', "Trial2", 'operator2@example.com', 'operator', '324567442', birth, rest_id=2, is_operator=True)
+    add_user('Operator', "Trial3", 'operator3@example.com', 'operator', '324542132', birth, rest_id=3, is_operator=True)
+    add_user('Operator', "Trial4", 'operator4@example.com', 'operator', '453672121', birth, rest_id=4, is_operator=True)
+    add_user("Alice", "Vecchio", "alice@example.com", "alice", "463366711", birth + datetime.timedelta(weeks=23, days=40))
+    if mark_positive_user(11):
+        print('Marked')
 
 def get_config(configuration=None):
     """
