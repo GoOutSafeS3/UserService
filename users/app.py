@@ -21,7 +21,7 @@ DEFAULT_CONFIGURATION = {
     "PORT": 8081, # the app port
     "DEBUG":True, # set debug mode
 
-    "SQLALCHEMY_DATABASE_URI": "users.db", # the database path/name
+    "SQLALCHEMY_DATABASE_URI": "db/users.db", # the database path/name
     "SQLALCHEMY_TRACK_MODIFICATIONS": False,
 
     "USE_MOCKS": False, # use mocks for external calls
