@@ -7,3 +7,5 @@ requests_mock
 pytest-cov
 connexion[swagger-ui]
 requests
+celery
+redis

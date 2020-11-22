@@ -1,0 +1,39 @@
+version: '3'
+services:
+  users:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - type: volume
+        source: db-production
+        target: /usr/src/app/users/db
+    depends_on:
+      - redis
+      - worker
+    ports:
+      - "8083:8080"
+    environment:
+      - "BROKER=redis://redis:6379"
+      - "BACKEND=redis://redis:6379"
+      - "CONFIG=DOCKER"
+  worker:
+    build:
+      context: .
+    environment:
+      - "BROKER=redis://redis:6379"
+      - "BACKEND=redis://redis:6379"
+      - "CONFIG=DOCKER"
+    command: celery -A users.worker:celery worker -l info -B -s /tmp/celerybeat-schedule
+    depends_on:
+      - redis
+    volumes:
+      - type: volume
+        source: db-production
+        target: /usr/src/app/users/db
+  redis:
+    image: "redis:alpine"
+    expose:
+      - "6379"
+volumes:
+  db-production:

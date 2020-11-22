@@ -1,3 +1,4 @@
+from users.background import init_celery
 import connexion
 import datetime
 import logging
@@ -26,7 +27,11 @@ DEFAULT_CONFIGURATION = {
     "USE_MOCKS": False, # use mocks for external calls
     "TIMEOUT": 2,  # timeout for external calls
     "REST_SERVICE_URL": "http://restaurants:8080", # restaurant microservice url
-    "BOOK_SERVICE_URL": "http://bookings:8080/"
+    "BOOK_SERVICE_URL": "http://bookings:8080/",
+
+    "UNMARK_AFTER": 600, # celery config for updating the ratings
+    "result_backend" : os.getenv("BACKEND", "redis://localhost:6379"),
+    "broker_url" : os.getenv("BROKER", "redis://localhost:6379"),
 }
 
 
@@ -136,8 +141,28 @@ def create_app(configuration=None):
     with app.app.app_context():
         setup(application, conf)
 
+    init_celery(application)
+    
     return app
 
+def create_worker_app():
+    configuration = os.getenv("CONFIG", "TEST")
+    logging.basicConfig(level=logging.INFO)
+
+    app = connexion.App(__name__)
+    app.add_api('./api.yaml')
+    # set the WSGI application callable to allow using uWSGI:
+    # uwsgi --http :8080 -w app
+    application = app.app
+
+    conf = get_config(configuration)
+    for k,v in conf.items():
+        application.config[k] = v # insert the requested configuration in the app configuration
+
+    
+    db.init_app(application)
+
+    return application
 
 if __name__ == '__main__':
 

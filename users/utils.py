@@ -201,6 +201,17 @@ def delete_user_(user):
         db.session.rollback()
         return Error500().get()
 
+def unmark_positive_user(id_user):
+    user = db.session.query(User).filter_by(id=id_user).first()
+    if user is not None:
+        try:
+            user.is_positive = False
+            user.positive_datetime = None
+            db.session.commit()
+            return True
+        except:  # pragma : no cover
+            db.session.rollback()
+            return False
 
 def mark_positive_user(id_user):
     user = db.session.query(User).filter_by(id=id_user).first()

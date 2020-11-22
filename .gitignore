@@ -141,3 +141,4 @@ report.html
 htmlcov
 
 .idea/*
+.vscode
