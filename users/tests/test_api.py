@@ -5,7 +5,7 @@ from users.app import create_app
 class UsersTest(unittest.TestCase):
     @classmethod
     def setUp(self):
-        self.app = create_app('TEST').app
+        self.app = create_app('TEST_MOCK').app
 
     def test_get_users(self):
         client = self.app.test_client()

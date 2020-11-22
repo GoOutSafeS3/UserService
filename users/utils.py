@@ -117,7 +117,7 @@ def get_from(url, params=None):
             r = req.get(url, timeout=2)
         try:
             return r.json(), r.status_code
-        except:
+        except: # pragma : no cover
             return {
                        "type": "about:blank",
                        "title": "Unexpected Error",

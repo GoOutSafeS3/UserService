@@ -6,8 +6,8 @@ from users.errors import Error500, Error404, Error400
 from users.utils import add_user, delete_user_, get_from, delete_from, bookings_mock
 from users.utils import restaurants_mock
 
-URL_BOOKINGS = 'http://127.0.0.1:8080'
-URL_RESTAURANTS = "http://127.0.0.1:8079"
+URL_BOOKINGS = "http://bookings:8080"
+URL_RESTAURANTS = "http://restaurants:8080"
 TIMEOUT = 2  # timeout for external get
 
 
@@ -194,30 +194,35 @@ def get_user_contacts(user_id, begin=None, end=None):
             if status_code != 200:
                 return Error400('BookingService error').get()
             for booking in bookings:
-                restaurant, status_code = get_from(URL_RESTAURANTS + '/restaurants/' + booking['restaurant_id'])
+                restaurant, status_code = get_from(URL_RESTAURANTS + '/restaurants/' + str(booking['restaurant_id']))
                 if status_code != 200:
                     return Error400("Restaurant Service error, Try again").get()
 
                 # get the occupation time of the restaurant
                 interval = datetime.timedelta(hours=restaurant['occupation_time'])
-                end = booking['entrance_datetime'] + interval
-                begin = booking['entrance_datetime'] - interval
+                try:
+                    booking_entrance = datetime.datetime.strptime(booking['entrance_datetime'], '%Y-%m-%d')
+                except:
+                    booking_entrance = None
+                if booking_entrance is not None:
+                    end = booking_entrance + interval
+                    begin = booking_entrance - interval
 
-                # get the bookings (of the same restaurant) in the occupation time interval
-                contact_bookings, status_code = get_from(URL_BOOKINGS + '/bookings',
-                                            params={'restaurant_id': booking['restaurant_id'],
-                                                    'begin_entrance': begin,
-                                                    'end_entrance': end})
+                    # get the bookings (of the same restaurant) in the occupation time interval
+                    contact_bookings, status_code = get_from(URL_BOOKINGS + '/bookings',
+                                                params={'restaurant_id': booking['restaurant_id'],
+                                                        'begin_entrance': begin,
+                                                        'end_entrance': end})
 
-                if status_code != 200:
-                    return Error400("Booking Service error, Try again").get()
-                for contact in contact_bookings:
-                    user_id_contact = contact['user_id']
-                    if user_id_contact != user_id:
-                        user_contact = db.session.query(User).filter_by(id=user_id_contact).first()
-                        if user_contact is not None:
-                            user_contact = user_contact.to_json()
-                            # insert the contact in the list
-                            user_contacts.append(user_contact)
+                    if status_code != 200:
+                        return Error400("Booking Service error, Try again").get()
+                    for contact in contact_bookings:
+                        user_id_contact = contact['user_id']
+                        if user_id_contact != user_id:
+                            user_contact = db.session.query(User).filter_by(id=user_id_contact).first()
+                            if user_contact is not None:
+                                user_contact = user_contact.to_json()
+                                # insert the contact in the list
+                                user_contacts.append(user_contact)
 
     return jsonify(user_contacts), 200

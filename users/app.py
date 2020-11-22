@@ -25,8 +25,8 @@ DEFAULT_CONFIGURATION = {
 
     "USE_MOCKS": False, # use mocks for external calls
     "TIMEOUT": 2,  # timeout for external calls
-    "REST_SERVICE_URL": "http://127.0.0.1:8079", # restaurant microservice url
-    "BOOK_SERVICE_URL": "http://127.0.0.1:8080"
+    "REST_SERVICE_URL": "http://restaurants:8080", # restaurant microservice url
+    "BOOK_SERVICE_URL": "http://bookings:8080/"
 }
 
 

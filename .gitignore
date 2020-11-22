@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*/.DS_Store
 
 # C extensions
 *.so
@@ -119,6 +120,7 @@ venv.bak/
 
 # mkdocs documentation
 /site
+.idea
 
 # mypy
 .mypy_cache/
