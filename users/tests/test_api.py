@@ -29,6 +29,7 @@ class UsersTest(unittest.TestCase):
         response = client.get('/users?email=anna@example.com', json=users)
         json = response.get_json()
         self.assertEqual(response.status_code, 200, msg=json)
+        self.assertEqual(len(json), 1, msg=json)
 
     def test_get_users_by_email_2(self):
         client = self.app.test_client()
