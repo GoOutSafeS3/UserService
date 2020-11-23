@@ -32,4 +32,4 @@ celery = create_celery(app)
 @celery.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
 
-    sender.add_periodic_task(2, unmark.s(), name=f"Unmark positive users | a controll each {app.config['UNMARK_AFTER']} seconds")
+    sender.add_periodic_task(float(app.config["UNMARK_AFTER"]), unmark.s(), name=f"Unmark positive users | a controll each {app.config['UNMARK_AFTER']} seconds")
