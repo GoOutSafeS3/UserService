@@ -104,7 +104,7 @@ def get_config(configuration=None):
 def setup(application, config):
     if config["REMOVE_DB"]:  # remove the db file
         try:
-            os.remove("bookings/" + config["SQLALCHEMY_DATABASE_URI"])
+            os.remove("users/" + config["SQLALCHEMY_DATABASE_URI"])
             logging.info("- GoOutSafe: Users Database Removed") # pragma: no cover
         except:
             pass
@@ -158,9 +158,13 @@ def create_worker_app():
     conf = get_config(configuration)
     for k,v in conf.items():
         application.config[k] = v # insert the requested configuration in the app configuration
+
+    application.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + application.config["SQLALCHEMY_DATABASE_URI"]
     db.init_app(application)
+    init_celery(application)
 
     return application
+
 
 if __name__ == '__main__':
 

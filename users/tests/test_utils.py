@@ -8,7 +8,7 @@ from users.app import create_app
 class UsersUtils(unittest.TestCase):
     @classmethod
     def setUp(self):
-        self.app = create_app('TEST_MOCK').app
+        self.app = create_app('TEST').app
 
     def test_add_user(self):
         with self.app.app_context():

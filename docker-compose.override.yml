@@ -20,7 +20,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - type: volume
-        source: db-testing
+        source: db-testing-users
         target: /usr/src/app/users/db
     depends_on:
       - redis
@@ -43,7 +43,7 @@ services:
       - redis
     volumes:
       - type: volume
-        source: db-testing
+        source: db-testing-users
         target: /usr/src/app/users/db
   redis:
     image: "redis:alpine"
@@ -66,4 +66,4 @@ services:
     ports:
       - "6379:6379"
 volumes:
-    db-testing:
+    db-testing-users:
