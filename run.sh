@@ -8,7 +8,9 @@ case "$1" in
         pytest --cov=users --cov-report term-missing
         ;;
     "unittests")
-        pytest --cov=users
+        docker-compose -f docker-compose.override.yml build
+        docker-compose -f docker-compose.override.yml up tests
+        docker-compose -f docker-compose.override.yml down
         ;;
     "setup")
         pip3 install -r requirements.txt

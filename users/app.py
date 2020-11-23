@@ -158,8 +158,6 @@ def create_worker_app():
     conf = get_config(configuration)
     for k,v in conf.items():
         application.config[k] = v # insert the requested configuration in the app configuration
-
-    
     db.init_app(application)
 
     return application

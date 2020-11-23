@@ -9,7 +9,7 @@ services:
     volumes:
       - .:/coverage
       - ./users/db:/usr/src/app/users/db
-    command: /usr/src/app/run.sh unittests
+    command: /usr/src/app/run.sh unittests-cov
     environment:
       - "BROKER=redis://local-redis:6379"
       - "BACKEND=redis://local-redis:6379"

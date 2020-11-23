@@ -4,110 +4,6 @@ import requests as req
 from users.database import User, db
 from users.errors import Error500, Error400
 
-#
-# ----------------------------------MOCK DATA--------------------------------
-#
-
-""" 
-Restaurants and Bookings mock
-They are identified starting from 1.
-"""
-
-bookings_mock = [
-
-]
-
-restaurants_mock = [
-    {
-        "url": "/restaurants/1",  # NO OPENING TIMES
-        "id": 1,
-        "name": "Rest 1",
-        "rating_val": 3.4,
-        "rating_num": 123,
-        "lat": 42.42,
-        "lon": 42.42,
-        "phone": "050123456",
-        "first_opening_hour": None,
-        "first_closing_hour": None,
-        "second_opening_hour": None,
-        "second_closing_hour": None,
-        "occupation_time": 0,
-        "cuisine_type": "cuisine_type",
-        "menu": "menu",
-        "closed_days": [1, 2, 3, 4, 5, 6, 7]
-    },
-    {
-        "url": "/restaurants/2",  # ONLY AT LUNCH (CLOSED ON MONDAYS)
-        "id": 2,
-        "name": "Rest 2",
-        "rating_val": 3.4,
-        "rating_num": 123,
-        "lat": 42.42,
-        "lon": 42.42,
-        "phone": "050123456",
-        "first_opening_hour": 10,
-        "first_closing_hour": 14,
-        "second_opening_hour": None,
-        "second_closing_hour": None,
-        "occupation_time": 1,
-        "cuisine_type": "cuisine_type",
-        "menu": "menu",
-        "closed_days": [1]
-    },
-    {
-        "url": "/restaurants/3",  # ALWAYS OPEN (NEVER CLOSED)
-        "id": 3,
-        "name": "Rest 3",
-        "rating_val": 3.4,
-        "rating_num": 123,
-        "lat": 42.42,
-        "lon": 42.42,
-        "phone": "050123456",
-        "first_opening_hour": 0,
-        "first_closing_hour": 23,
-        "second_opening_hour": 0,
-        "second_closing_hour": 0,
-        "occupation_time": 2,
-        "cuisine_type": "cuisine_type",
-        "menu": "menu",
-        "closed_days": []
-    },
-    {
-        "url": "/restaurants/4",  # TWO OPENINGS (CLOSED ON SUNDAY AND MONDAYS)
-        "id": 4,
-        "name": "Rest 4",
-        "rating_val": 3.4,
-        "rating_num": 123,
-        "lat": 42.42,
-        "lon": 42.42,
-        "phone": "050123456",
-        "first_opening_hour": 10,
-        "first_closing_hour": 12,
-        "second_opening_hour": 20,
-        "second_closing_hour": 23,
-        "occupation_time": 2,
-        "cuisine_type": "cuisine_type",
-        "menu": "menu",
-        "closed_days": [1, 7]
-    }
-]
-
-""" 
-The list of tables (for restaurant mock)
-They are identified starting from 1.
-"""
-
-tables = [
-    [{"id": 1, "capacity": 4}],
-    [{"id": 2, "capacity": 3}],
-    [{"id": 4, "capacity": 5}, {"id": 5, "capacity": 4}, {"id": 6, "capacity": 2}],
-    [{"id": 3, "capacity": 2}]
-]
-
-
-#
-# --------------------------SERVICES UTILITY FUNCTIONS----------------------------
-#
 
 def get_from(url, params=None):
     try:
@@ -117,14 +13,15 @@ def get_from(url, params=None):
             r = req.get(url, timeout=2)
         try:
             return r.json(), r.status_code
-        except: # pragma : no cover
+        except:  # pragma: no cover
             return {
                        "type": "about:blank",
                        "title": "Unexpected Error",
                        "status": r.status_code,
                        "detail": "Unexpected error occurs",
                    }, r.status_code
-    except:
+    except Exception as e:
+        print(e)
         return {
                    "type": "about:blank",
                    "title": "Internal Server Error",
@@ -145,7 +42,8 @@ def delete_from(url):
                        "status": r.status_code,
                        "detail": "Unexpected error occurs",
                    }, r.status_code
-    except:
+    except Exception as e:
+        print(e)
         return {
                    "type": "about:blank",
                    "title": "Internal Server Error",
@@ -182,7 +80,7 @@ def add_user(firstname, lastname, email, password, phone, dateofbirth,
         db.session.add(new_user)
         db.session.commit()
         return new_user.to_json()
-    except:  # pragma : no cover
+    except:  # pragma: no cover
         db.session.rollback()
         return Error500().get()
 
@@ -201,7 +99,8 @@ def delete_user_(user):
         db.session.rollback()
         return Error500().get()
 
-def unmark_positive_user(id_user):
+
+def unmark_positive_user(id_user): # pragma: no cover
     user = db.session.query(User).filter_by(id=id_user).first()
     if user is not None:
         try:
@@ -209,9 +108,10 @@ def unmark_positive_user(id_user):
             user.positive_datetime = None
             db.session.commit()
             return True
-        except:  # pragma : no cover
+        except:  # pragma: no cover
             db.session.rollback()
             return False
+
 
 def mark_positive_user(id_user):
     user = db.session.query(User).filter_by(id=id_user).first()
@@ -221,6 +121,6 @@ def mark_positive_user(id_user):
             user.positive_datetime = datetime.datetime.today()
             db.session.commit()
             return True
-        except:  # pragma : no cover
+        except:  # pragma: no cover
             db.session.rollback()
             return False

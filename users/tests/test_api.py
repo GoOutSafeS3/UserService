@@ -1,11 +1,15 @@
+import datetime
 import unittest
+
+from users.api import URL_BOOKINGS, URL_RESTAURANTS
 from users.app import create_app
+import requests_mock
 
 
 class UsersTest(unittest.TestCase):
     @classmethod
     def setUp(self):
-        self.app = create_app('TEST_MOCK').app
+        self.app = create_app('TEST').app
 
     def test_get_users(self):
         client = self.app.test_client()
@@ -273,6 +277,72 @@ class UsersTest(unittest.TestCase):
                           'type': 'about:blank'}
         json2 = response1.get_json()
         self.assertDictEqual(json2, expected_error)
+
+    def test_get_contacts(self):
+        client = self.app.test_client()
+        with requests_mock.mock() as mock:
+            end_ = datetime.datetime.today()
+            begin_ = end_ - datetime.timedelta(weeks=2)
+            url = URL_BOOKINGS + '/bookings?user_id=2&begin='+str(begin_)+'&end='+str(end_)
+            bookings = [{
+                'id':3,
+                'user_id':2,
+                'datetime': str(datetime.datetime.today()-datetime.timedelta(days=8)),
+                'restaurant_id': 1,
+                'entrance_datetime': str(datetime.datetime.today())
+            }]
+            mock.get(url, json=bookings)
+            rest = {
+                'id': 1,
+                'occupation_time': 2
+            }
+            for booking in bookings:
+                booking_entrance = booking['entrance_datetime']
+                url_rest = URL_RESTAURANTS + '/restaurants/1'
+                mock.get(url_rest, json=rest)
+                end = datetime.datetime.strptime(booking_entrance[0:9],'%Y-%m-%d') + datetime.timedelta(hours=rest['occupation_time'])
+                begin = datetime.datetime.strptime(booking_entrance[0:9],'%Y-%m-%d') - datetime.timedelta(hours=rest['occupation_time'])
+
+                bookings_contact = [{
+                    'id': 4,
+                    'user_id': 3,
+                    'datetime': str(datetime.datetime.today() - datetime.timedelta(days=8)),
+                    'restaurant_id': 1,
+                    'entrance_datetime': str(datetime.datetime.today())
+                }]
+
+                url = URL_BOOKINGS + '/bookings?datetime='+str(booking['datetime'])+'&restaurant_id=1&begin_entrance=' + str(begin) + '&end_entrance=' + str(end)
+                mock.get(url, json=bookings_contact)
+                reply = client.get('/users/2/contacts?begin='+str(begin_)+'&end='+str(end_))
+                print(reply.get_json())
+                self.assertEqual(reply.status_code, 200)
+
+    def test_z_delete_user_with_mock(self): # operatore id=8 rest_id=2, provo a cancellare operatore con bookings futuri
+        client = self.app.test_client()
+        with requests_mock.mock() as mock:
+            bookings = [{
+                'id':4,
+                'rest_id':1
+            }]
+            begin = str(datetime.datetime.today())
+            url = URL_BOOKINGS +'/bookings?rest_id=2&begin='+begin[0:9]
+            mock.get(url, json=bookings)
+            reply = client.delete('/users/8')
+            self.assertEqual(reply.status_code, 400)
+
+    def test_z_delete_user_with_mock204(self):  # operatore id=7 rest_id=1, provo a cancellare operatore senza bookings
+        client = self.app.test_client()
+        with requests_mock.mock() as mock:
+            no_bookings = []
+            begin = str(datetime.datetime.today())
+            url = URL_BOOKINGS + '/bookings?rest_id=1&begin=' + begin[0:9]
+            mock.get(url, json=no_bookings)
+            url_rest = URL_RESTAURANTS + '/restaurants/1'
+            response = {'status_code': 204}
+            mock.delete(url_rest, json=response)
+            reply = client.delete('/users/7')
+            print(reply.get_json())
+            self.assertEqual(reply.status_code, 201)
 
 
 if __name__ == '__main__':
