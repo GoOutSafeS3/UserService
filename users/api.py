@@ -19,20 +19,17 @@ def get_users(ssn=None, phone=None, email=None, is_positive=None):
         elif is_positive == 'False':
             users = users.filter_by(is_positive=False).all()
     if ssn is not None:
-        user = users.filter_by(ssn=ssn).first()
-        if user is None:
+        user = users.filter_by(ssn=ssn).all()
+        if len(user) == 0:
             return Error404("User not found").get()
-        return user.to_json(), 200
     if phone is not None:
-        user = users.filter_by(phone=int(phone)).first()
-        if user is None:
+        user = users.filter_by(phone=int(phone)).all()
+        if len(user) == 0:
             return Error404("User not found").get()
-        return user.to_json(), 200
     if email is not None:
-        user = users.filter_by(email=email).first()
-        if user is None:
+        user = users.filter_by(email=email).all()
+        if len(user) == 0:
             return Error404("User not found").get()
-        return user.to_json(), 200
     return jsonify([user.to_json() for user in users]), 200
 
 
