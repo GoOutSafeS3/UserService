@@ -36,6 +36,7 @@ def init_celery(app, worker=False):
     # load celery config
     celery.config_from_object(app.config)
     global _APP
+    print("asdasdsadsadasd\n\n\n\n")
     _APP = app
     if not worker:
         # Config for non-worker related settings
