@@ -1,6 +1,6 @@
 import datetime
 import unittest
-
+from werkzeug.security import generate_password_hash, check_password_hash
 from users.api import URL_BOOKINGS, URL_RESTAURANTS
 from users.app import create_app
 import requests_mock
@@ -70,8 +70,8 @@ class UsersTest(unittest.TestCase):
         client = self.app.test_client()
         new_user = {
             'email': 'new@example.com',
-            'password': 'new',
-            'password_repeat': 'new',
+            'password': generate_password_hash('new'),
+            'password_repeat': generate_password_hash('new'),
             'firstname': 'Nuovo',
             'lastname': 'Utente',
             'phone': '345141451',
@@ -85,8 +85,8 @@ class UsersTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200, msg=json)
         new_user = {
             'email': 'new@example.com',
-            'password': 'new',
-            'password_repeat': 'new',
+            'password': generate_password_hash('new'),
+            'password_repeat': generate_password_hash('new'),
             'firstname': 'Nuovo1',
             'lastname': 'Utente1',
             'phone': '345141454',
@@ -100,8 +100,8 @@ class UsersTest(unittest.TestCase):
         self.assertEqual(response.status_code, 400, msg=json)
         new_user = {
             'email': 'new2@example.com',
-            'password': 'new2',
-            'password_repeat': 'new2',
+            'password': generate_password_hash('new2'),
+            'password_repeat': generate_password_hash('new2'),
             'firstname': 'Nuovo2',
             'lastname': 'Utente2',
             'phone': '3451414553',
@@ -117,8 +117,8 @@ class UsersTest(unittest.TestCase):
 
         new_user = {
             'email': 'new2@example.com',
-            'password': 'new2',
-            'password_repeat': 'new2',
+            'password': generate_password_hash('new2'),
+            'password_repeat': generate_password_hash('new2'),
             'firstname': 'Nuovo2',
             'lastname': 'Utente2',
             'phone': '3451414553',
@@ -138,9 +138,9 @@ class UsersTest(unittest.TestCase):
             'firstname': 'Anna',
             'lastname': 'Rossi',
             'email': "anna@example.com",
-            'old_password': "anna",
-            'password': "anna",
-            'password_repeat': "anna",
+            'old_password': generate_password_hash('anna'),
+            'password': generate_password_hash('anna'),
+            'password_repeat':generate_password_hash('anna'),
             'phone': "46968411",
             'dateofbirth': "1990-11-11",
             'is_positive': True,
@@ -162,9 +162,9 @@ class UsersTest(unittest.TestCase):
             'firstname': 'Gianni',
             'lastname': 'Rossi',
             'email': "anna@example.com",
-            'old_password': "admin",
-            'password': "anna",
-            'password_repeat': "anna",
+            'old_password': generate_password_hash('admin'),
+            'password': generate_password_hash('anna'),
+            'password_repeat': generate_password_hash('anna'),
             'phone': "46968411",
             'dateofbirth': "1990-11-11",
             'is_positive': True,
@@ -186,7 +186,7 @@ class UsersTest(unittest.TestCase):
             'firstname': 'Daniele',
             'lastname': 'Verdi',
             'email': "daniele@example.com",
-            'old_password': "operator",
+            'old_password': generate_password_hash('operator'),
             'password': "anna",
             'password_repeat': "anna",
             'phone': "4696855791",
@@ -211,7 +211,7 @@ class UsersTest(unittest.TestCase):
             'firstname': 'Giada',
             'lastname': 'Verdi',
             'email': "giada@example.com",
-            'old_password': "operator",
+            'old_password': generate_password_hash('operator'),
             'password': "anna",
             'password_repeat': "anna",
             'phone': "46968411",
@@ -239,7 +239,7 @@ class UsersTest(unittest.TestCase):
         # --------------------------------------------
         param = {
             'email': "giada@example.com",
-            'password': "anna"
+            'password': generate_password_hash('anna')
         }
         response = client.delete('/users/999', json=param)
         json = response.get_json()
@@ -257,9 +257,9 @@ class UsersTest(unittest.TestCase):
             'firstname': 'Anna',
             'lastname': 'Rossi',
             'email': "anna@example.com",
-            'old_password': "anna",
-            'password': "anna",
-            'password_repeat': "anna",
+            'old_password': generate_password_hash('anna'),
+            'password': generate_password_hash('anna'),
+            'password_repeat': generate_password_hash('anna'),
             'phone': "46968411",
             'dateofbirth': "1990-11-11",
             'is_positive': True,
@@ -318,6 +318,9 @@ class UsersTest(unittest.TestCase):
                 self.assertEqual(reply.status_code, 200)
 
     def test_z_delete_user_with_mock(self): # operatore id=8 rest_id=2, provo a cancellare operatore con bookings futuri
+        # --------------------------------------------
+        # TEST DELETE USER cannot delete operator with future bookings
+        # --------------------------------------------
         client = self.app.test_client()
         with requests_mock.mock() as mock:
             bookings = [{
@@ -331,6 +334,9 @@ class UsersTest(unittest.TestCase):
             self.assertEqual(reply.status_code, 400)
 
     def test_z_delete_user_with_mock204(self):  # operatore id=7 rest_id=1, provo a cancellare operatore senza bookings
+        # --------------------------------------------
+        # TEST DELETE USER can delete operator
+        # --------------------------------------------
         client = self.app.test_client()
         with requests_mock.mock() as mock:
             no_bookings = []

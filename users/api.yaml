@@ -305,19 +305,19 @@ components:
           description: User's lastname
           example: "Verdi"
         password:
-          maxLength: 20
+          maxLength: 120
           minLength: 3
           type: string
           description: User's password
           example: "xxx"
         password_repeat:
-          maxLength: 20
+          maxLength: 120
           minLength: 3
           type: string
           description: User's password
           example: "xxx"
         old_password:
-          maxLength: 20
+          maxLength: 120
           minLength: 3
           type: string
           description: User's old password (to confirm the editing of the user)

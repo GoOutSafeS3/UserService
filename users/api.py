@@ -4,6 +4,7 @@ import requests
 from users.database import db, User
 from users.errors import Error500, Error404, Error400
 from users.utils import add_user, delete_user_, get_from, delete_from
+from werkzeug.security import generate_password_hash, check_password_hash
 
 URL_BOOKINGS = "http://bookings:8080"
 URL_RESTAURANTS = "http://restaurants:8080"
