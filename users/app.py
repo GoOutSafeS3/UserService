@@ -51,7 +51,7 @@ def fake_data():
     add_user('Operator', "Trial5", 'operator5@example.com', generate_password_hash('operator'), '4536741121', birth, rest_id=None, is_operator=True)
     add_user('Operator', "Trial6", 'operator6@example.com', generate_password_hash('operator'), '6457812732', birth, rest_id=None, is_operator=True)
     add_user("Alice", "Vecchio", "alice@example.com", generate_password_hash("alice"), "463366711", birth + datetime.timedelta(weeks=23, days=40))
-    if mark_positive_user(11):
+    if mark_positive_user(13):
         print('Marked')
 
 
