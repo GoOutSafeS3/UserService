@@ -216,10 +216,27 @@ class UsersTest(unittest.TestCase):
                           'type': 'about:blank'}
         self.assertDictEqual(json, expected_error)
 
-    """
-    inserire test su get_user_contacts
-    
-    """
+    def test_edit_rest_id(self):
+        client = self.app.test_client()
+        modify_user = {
+            'id': 11,
+            'firstname': 'Operator',
+            'lastname': 'Trial5',
+            'email': "operator5@example.com",
+            'password': generate_password_hash('operator'),
+            'phone': "3425186743",
+            'dateofbirth': "1990-11-11",
+            'is_positive': False,
+            'rest_id': 6,
+            'ssn': None,
+        }
+        response = client.put('/users/11', json=modify_user)
+        self.assertEqual(response.status_code, 200)
+        resp = client.get('users/11')
+        resp_j = resp.get_json()
+        resp_j['dateofbirth'] = resp_j['dateofbirth'][:10]
+        for k in modify_user:
+            self.assertEqual(modify_user[k],resp_j[k])
 
     def test_z_delete_user(self):
         client = self.app.test_client()
@@ -287,8 +304,8 @@ class UsersTest(unittest.TestCase):
                 booking_entrance = booking['entrance_datetime']
                 url_rest = URL_RESTAURANTS + '/restaurants/1'
                 mock.get(url_rest, json=rest)
-                end = datetime.datetime.strptime(booking_entrance[0:9],'%Y-%m-%d') + datetime.timedelta(hours=rest['occupation_time'])
-                begin = datetime.datetime.strptime(booking_entrance[0:9],'%Y-%m-%d') - datetime.timedelta(hours=rest['occupation_time'])
+                end = datetime.datetime.strptime(booking_entrance[:10],'%Y-%m-%d') + datetime.timedelta(hours=rest['occupation_time'])
+                begin = datetime.datetime.strptime(booking_entrance[:10],'%Y-%m-%d') - datetime.timedelta(hours=rest['occupation_time'])
 
                 bookings_contact = [{
                     'id': 4,
@@ -315,7 +332,7 @@ class UsersTest(unittest.TestCase):
                 'rest_id':1
             }]
             begin = str(datetime.datetime.today())
-            url = URL_BOOKINGS +'/bookings?rest_id=2&begin='+begin[0:9]
+            url = URL_BOOKINGS +'/bookings?rest_id=2&begin='+begin[:10]
             mock.get(url, json=bookings)
             reply = client.delete('/users/8')
             self.assertEqual(reply.status_code, 400)
@@ -328,14 +345,13 @@ class UsersTest(unittest.TestCase):
         with requests_mock.mock() as mock:
             no_bookings = []
             begin = str(datetime.datetime.today())
-            url = URL_BOOKINGS + '/bookings?rest_id=1&begin=' + begin[0:9]
+            url = URL_BOOKINGS + '/bookings?rest_id=1&begin=' + begin[:10]
             mock.get(url, json=no_bookings)
             url_rest = URL_RESTAURANTS + '/restaurants/1'
             response = {'status_code': 204}
             mock.delete(url_rest, json=response)
             reply = client.delete('/users/7')
-            print(reply.get_json())
-            self.assertEqual(reply.status_code, 201)
+            self.assertEqual(reply.status_code, 204)
 
 
 if __name__ == '__main__':

@@ -104,17 +104,21 @@ def edit_user(user_id):
         user.dateofbirth = datetime.datetime.strptime(dateofbirth[:10], '%Y-%m-%d')
         user.password = req['password']
         user.phone = req['phone']
-        if req['is_positive']:
-            user.is_positive = True
-            user.positive_datetime = datetime.datetime.today()
-        if req['ssn'] == '':
+        if 'is_positive' in req:
+            if req['is_positive'] is True:
+                user.is_positive = True
+                user.positive_datetime = datetime.datetime.today()
+            else:
+                user.is_positive = False
+                user.positive_datetime = None
+        if not req['ssn']:
             user.ssn = None
         else:
             user_ssn = db.session.query(User).filter_by(ssn=req['ssn']).first()
             if user_ssn is not None and user_ssn.id != user_id:
                 return Error400("The ssn already exist").get()
             user.ssn = req['ssn']
-        if user.is_operator and req['rest_id'] != 'None':
+        if user.is_operator and req['rest_id']:
             user.rest_id = int(req['rest_id'])
         db.session.commit()
     except:
@@ -134,7 +138,7 @@ def delete_user(user_id):
 
     today = str(datetime.datetime.today())
     params = {'rest_id': user.rest_id,
-              'begin': today[0:9]}
+              'begin': today[:10]}
 
     if user.is_operator and user.rest_id is not None:  # the user is operator with restaurant
 
@@ -193,7 +197,7 @@ def get_user_contacts(user_id, begin=None, end=None):
         interval = datetime.timedelta(hours=restaurant['occupation_time'])
         try:
             booking_entrance = booking['entrance_datetime']
-            booking_entrance = datetime.datetime.strptime(booking_entrance[0:9], '%Y-%m-%d')
+            booking_entrance = datetime.datetime.strptime(booking_entrance[:10], '%Y-%m-%d')
         except:
             booking_entrance = None
         if booking_entrance is not None:

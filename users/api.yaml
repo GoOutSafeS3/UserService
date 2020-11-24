@@ -284,6 +284,7 @@ components:
           example: 122
         rest_id:
           type: integer
+          nullable: true
           description: Restaurant's identifier
           example: 122
         email:
@@ -324,6 +325,7 @@ components:
           minLength: 16
           type: string
           description: Unique User's identifier
+          nullable: true
           example: "VRDNNAC5H58H762R"
         is_operator:
           example: false

@@ -81,7 +81,8 @@ def add_user(firstname, lastname, email, password, phone, dateofbirth,
         db.session.add(new_user)
         db.session.commit()
         return new_user.to_json()
-    except:  # pragma: no cover
+    except Exception as e:
+        print(e)  # pragma: no cover
         db.session.rollback()
         return Error500().get()
 
@@ -93,10 +94,11 @@ def delete_user_(user):
         return {
                    "type": 'Success delete',
                    "title": 'user deleted successfully',
-                   "status": 201,
+                   "status": 204,
                    "detail": '',
-               }, 201
-    except:  # pragma : no cover
+               }, 204
+    except Exception as e: # pragma : no cover
+        print(e)
         db.session.rollback()
         return Error500().get()
 

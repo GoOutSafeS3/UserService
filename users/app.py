@@ -54,6 +54,7 @@ def fake_data():
     if mark_positive_user(11):
         print('Marked')
 
+
 def get_config(configuration=None):
     """
     Returns a json file containing the configuration to use in the app
