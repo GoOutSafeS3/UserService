@@ -17,6 +17,7 @@ paths:
       - in: path
         name: user_id
         description: User's unique identifier
+        required: true
         schema:
           type: integer
       - in: query
