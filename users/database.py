@@ -27,7 +27,7 @@ class User(db.Model):
 
     def to_json(self):
         js = {}
-        for attr in ('id', 'firstname', 'lastname',
+        for attr in ('id', 'rest_id', 'firstname', 'lastname',
                      'email', 'phone', 'ssn',
                      'dateofbirth', 'is_active','is_anonymous',
                      'is_admin', 'is_health_authority','is_operator',
