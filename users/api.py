@@ -26,7 +26,7 @@ def get_users(ssn=None, phone=None, email=None, is_positive=None):
         users = users.filter_by(email=email)
     users = users.all()
     if len(users) == 0:
-        return Error404("User not found").get()
+        return Error404("User not found").get(), 400
     return jsonify([user.to_json() for user in users]), 200
 
 
@@ -52,15 +52,15 @@ def create_user():
     exist_email = db.session.query(User).filter_by(email=email).first()
     exist_phone = db.session.query(User).filter_by(phone=phone).first()
 
-    if ssn != '':
+    if ssn != '' and ssn is not None:
         exist_ssn = db.session.query(User).filter_by(ssn=ssn).first()
 
     if exist_email is not None or exist_phone is not None or exist_ssn is not None:
-        return Error400("The User already exist").get()
+        return Error400("The User already exist").get(), 400
 
     today = datetime.datetime.today()
     if datetime.datetime.strptime(dateofbirth[:10], '%Y-%m-%d') > today:
-        return Error400("Date Birth error").get()
+        return Error400("Date Birth error").get(), 400
 
     response = add_user(firstname,
                         lastname,
@@ -69,31 +69,31 @@ def create_user():
                         phone,
                         datetime.datetime.strptime(dateofbirth[:10], '%Y-%m-%d'),
                         is_health, is_operator, is_admin)
-    return response
+    return response, 200
 
 
 def get_id_user(user_id):
     user = db.session.query(User).filter_by(id=user_id).first()
     if not user:
         return Error404("User not found").get()
-    return user.to_json()
+    return user.to_json(), 200
 
 
 def edit_user(user_id):
     req = request.json
     user = db.session.query(User).filter_by(id=user_id).first()
     if not user:
-        return Error404("User not found").get()
+        return Error404("User not found").get(), 400
 
     user_email = db.session.query(User).filter_by(email=req['email']).first()
     if user_email is not None:
         if user_email.id != user_id:
-            return Error400("The email already exist").get()
+            return Error400("The email already exist").get(), 400
 
     user_phone = db.session.query(User).filter_by(phone=req['phone']).first()
     if user_phone is not None:
         if user_phone.id != user_id:
-            return Error400("The phone already exist").get()
+            return Error400("The phone already exist").get(), 400
     try:
         user.firstname = req['firstname']
         user.lastname = req['lastname']
@@ -121,18 +121,18 @@ def edit_user(user_id):
         db.session.commit()
     except:
         db.session.rollback()
-        return Error500().get()
+        return Error500().get(), 500
 
-    return user.to_json()
+    return user.to_json(), 200
 
 
 def delete_user(user_id):
     user = db.session.query(User).filter_by(id=user_id).first()
     if user is None:
-        return Error404('User not found').get()
+        return Error404('User not found').get(), 404
 
     if user.is_positive is True:  # if the user is Covid-19 positive he can not delete his data
-        return Error400("You cannot delete your data as long as you are positive").get()
+        return Error400("You cannot delete your data as long as you are positive").get(), 400
 
     today = str(datetime.datetime.today())
     params = {'rest_id': user.rest_id,
@@ -144,27 +144,27 @@ def delete_user(user_id):
 
         bookings, status_code = get_from(url, params)
         if status_code != 200:
-            return Error400('BookingService error').get()
+            return Error400('BookingService error').get(), 400
         if bookings:
-            return Error400("you cannot delete the account if you have active reservations in your restaurant").get()
+            return Error400("you cannot delete the account if you have active reservations in your restaurant").get(), 400
         else:
             url = URL_RESTAURANTS + '/restaurants/' + str(user.rest_id)
             resp, status_code = delete_from(url)
             if status_code == 204 or status_code == 200:
                 return delete_user_(user)
             else:
-                return Error400('Error on try to delete the restaurant').get()
+                return Error400('Error on try to delete the restaurant').get(), 400
 
     else:  # the user is not operator
 
         url = URL_BOOKINGS + '/bookings'
         bookings,status_code = get_from(url=url, params=params)
         if status_code != 200:
-            return Error400('BookingService error').get()
+            return Error400('BookingService error').get(), 400
         if bookings:
-            return Error400("you cannot delete the account if you have active reservations").get()
+            return Error400("you cannot delete the account if you have active reservations").get(), 400
 
-    return delete_user_(user)
+    return delete_user_(user), 204
 
 
 def get_user_contacts(user_id, begin=None, end=None):
@@ -172,11 +172,11 @@ def get_user_contacts(user_id, begin=None, end=None):
         end = datetime.datetime.today()
         begin = end - datetime.timedelta(weeks=2)
     elif (begin is None and end is not None) or (begin is not None and end is None):
-        return Error400("Specify both dates or none").get()
+        return Error400("Specify both dates or none").get(), 400
     user_contacts = []
     user = db.session.query(User).filter(User.id == user_id).first()
     if user is None:
-        return Error404("User not found").get()
+        return Error404("User not found").get(), 404
 
     params = {'user_id': user_id,
               'begin': str(begin),
@@ -189,7 +189,7 @@ def get_user_contacts(user_id, begin=None, end=None):
     for booking in bookings:
         restaurant, status_code = get_from(URL_RESTAURANTS + '/restaurants/' + str(booking['restaurant_id']))
         if status_code != 200:
-            return Error400("Restaurant Service error, Try again").get()
+            return Error400("Restaurant Service error, Try again").get(), 400
 
         # get the occupation time of the restaurant
         interval = datetime.timedelta(hours=restaurant['occupation_time'])
@@ -211,7 +211,7 @@ def get_user_contacts(user_id, begin=None, end=None):
                                                 'begin_entrance': str(begin),
                                                 'end_entrance': str(end)})
             if status_code != 200:
-                return Error400("Booking Service error, Try again").get()
+                return Error400("Booking Service error, Try again").get(), 400
             for contact in contact_bookings:
                 user_id_contact = contact['user_id']
                 if user_id_contact != user_id:
