@@ -310,18 +310,6 @@ components:
           type: string
           description: User's password
           example: "xxx"
-        password_repeat:
-          maxLength: 120
-          minLength: 3
-          type: string
-          description: User's password
-          example: "xxx"
-        old_password:
-          maxLength: 120
-          minLength: 3
-          type: string
-          description: User's old password (to confirm the editing of the user)
-          example: "xxx"
         phone:
           type: string
           description:  User's telephone number

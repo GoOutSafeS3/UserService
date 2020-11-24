@@ -64,7 +64,7 @@ def add_user(firstname, lastname, email, password, phone, dateofbirth,
         new_user.firstname = firstname
         new_user.lastname = lastname
         new_user.email = email
-        new_user.password = generate_password_hash(password)
+        new_user.password = password
         new_user.phone = phone
         new_user.dateofbirth = dateofbirth
         new_user.is_positive = False

@@ -72,7 +72,6 @@ class UsersTest(unittest.TestCase):
         new_user = {
             'email': 'new@example.com',
             'password': generate_password_hash('new'),
-            'password_repeat': generate_password_hash('new'),
             'firstname': 'Nuovo',
             'lastname': 'Utente',
             'phone': '345141451',
@@ -87,7 +86,6 @@ class UsersTest(unittest.TestCase):
         new_user = {
             'email': 'new@example.com',
             'password': generate_password_hash('new'),
-            'password_repeat': generate_password_hash('new'),
             'firstname': 'Nuovo1',
             'lastname': 'Utente1',
             'phone': '345141454',
@@ -102,7 +100,6 @@ class UsersTest(unittest.TestCase):
         new_user = {
             'email': 'new2@example.com',
             'password': generate_password_hash('new2'),
-            'password_repeat': generate_password_hash('new2'),
             'firstname': 'Nuovo2',
             'lastname': 'Utente2',
             'phone': '3451414553',
@@ -119,7 +116,6 @@ class UsersTest(unittest.TestCase):
         new_user = {
             'email': 'new2@example.com',
             'password': generate_password_hash('new2'),
-            'password_repeat': generate_password_hash('new2'),
             'firstname': 'Nuovo2',
             'lastname': 'Utente2',
             'phone': '3451414553',
@@ -139,9 +135,7 @@ class UsersTest(unittest.TestCase):
             'firstname': 'Anna',
             'lastname': 'Rossi',
             'email': "anna@example.com",
-            'old_password': generate_password_hash('anna'),
             'password': generate_password_hash('anna'),
-            'password_repeat':generate_password_hash('anna'),
             'phone': "46968411",
             'dateofbirth': "1990-11-11",
             'is_positive': True,
@@ -163,9 +157,7 @@ class UsersTest(unittest.TestCase):
             'firstname': 'Gianni',
             'lastname': 'Rossi',
             'email': "anna@example.com",
-            'old_password': generate_password_hash('admin'),
-            'password': generate_password_hash('anna'),
-            'password_repeat': generate_password_hash('anna'),
+            'password': generate_password_hash('gianni'),
             'phone': "46968411",
             'dateofbirth': "1990-11-11",
             'is_positive': True,
@@ -187,9 +179,7 @@ class UsersTest(unittest.TestCase):
             'firstname': 'Daniele',
             'lastname': 'Verdi',
             'email': "daniele@example.com",
-            'old_password': generate_password_hash('operator'),
-            'password': "anna",
-            'password_repeat': "anna",
+            'password': generate_password_hash('daniele'),
             'phone': "4696855791",
             'dateofbirth': "1990-11-11",
             'is_positive': True,
@@ -212,9 +202,7 @@ class UsersTest(unittest.TestCase):
             'firstname': 'Giada',
             'lastname': 'Verdi',
             'email': "giada@example.com",
-            'old_password': generate_password_hash('operator'),
-            'password': "anna",
-            'password_repeat': "anna",
+            'password': generate_password_hash('giada'),
             'phone': "46968411",
             'dateofbirth': "1990-11-11",
             'is_positive': True
@@ -240,7 +228,7 @@ class UsersTest(unittest.TestCase):
         # --------------------------------------------
         param = {
             'email': "giada@example.com",
-            'password': generate_password_hash('anna')
+            'password': generate_password_hash('giada')
         }
         response = client.delete('/users/999', json=param)
         json = response.get_json()
@@ -258,9 +246,7 @@ class UsersTest(unittest.TestCase):
             'firstname': 'Anna',
             'lastname': 'Rossi',
             'email': "anna@example.com",
-            'old_password': generate_password_hash('anna'),
             'password': generate_password_hash('anna'),
-            'password_repeat': generate_password_hash('anna'),
             'phone': "46968411",
             'dateofbirth': "1990-11-11",
             'is_positive': True,
