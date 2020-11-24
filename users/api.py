@@ -34,7 +34,6 @@ def create_user():
     req = request.json
     ssn = ''
     is_health = False
-    is_operator = False
     is_admin = False
     exist_ssn = None
     firstname = req['firstname']
@@ -43,14 +42,13 @@ def create_user():
     password = req['password']
     phone = req['phone']
     dateofbirth = req['dateofbirth']
-    try:
+    if 'ssn' in req:
         ssn = req['ssn']
-        is_operator = req['is_operator']
+    is_operator = req['is_operator']
+    if 'is_admin' in req:
         is_admin = req['is_admin']
+    if 'is_health' in req:
         is_health = req['is_health_authority']
-    except:
-        pass
-
     exist_email = db.session.query(User).filter_by(email=email).first()
     exist_phone = db.session.query(User).filter_by(phone=phone).first()
 
