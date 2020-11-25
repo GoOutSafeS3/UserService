@@ -5,6 +5,7 @@ from users.database import db, User
 from users.errors import Error500, Error404, Error400
 from users.utils import add_user, delete_user_, get_from, delete_from
 from werkzeug.security import generate_password_hash, check_password_hash
+import dateutil.parser
 
 URL_BOOKINGS = "http://bookings:8080"
 URL_RESTAURANTS = "http://restaurants:8080"
@@ -197,8 +198,8 @@ def get_user_contacts(user_id, begin=None, end=None):
         # get the occupation time of the restaurant
         interval = datetime.timedelta(hours=restaurant['occupation_time'])
         try:
-            booking_entrance = booking['entrance_datetime']
-            booking_entrance = datetime.datetime.strptime(booking_entrance[:10], '%Y-%m-%d')
+            booking_entrance = dateutil.parser.parse(booking['entrance_datetime'])
+            #booking_entrance = datetime.datetime.strptime(booking_entrance[:10], '%Y-%m-%d')
         except:
             booking_entrance = None
         if booking_entrance is not None:
@@ -225,7 +226,8 @@ def get_user_contacts(user_id, begin=None, end=None):
                     if user_contact is not None:
                         user_contact = user_contact.to_json()
                         # insert the contact in the list
-                        user_contacts.append(user_contact)
+                        if user_contact not in user_contacts:
+                            user_contacts.append(user_contact)
     print(user_contacts)
 
     return jsonify(user_contacts), 200

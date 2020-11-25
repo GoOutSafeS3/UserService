@@ -9,3 +9,4 @@ connexion[swagger-ui]
 requests
 celery
 redis
+python-dateutil
