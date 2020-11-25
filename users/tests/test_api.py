@@ -291,7 +291,7 @@ class UsersTest(unittest.TestCase):
             bookings = [{
                 'id':3,
                 'user_id':2,
-                'datetime': str(datetime.datetime.today()-datetime.timedelta(days=8)),
+                'booking_datetime': str(datetime.datetime.today()-datetime.timedelta(days=8)),
                 'restaurant_id': 1,
                 'entrance_datetime': str(datetime.datetime.today())
             }]
@@ -310,17 +310,17 @@ class UsersTest(unittest.TestCase):
                 bookings_contact = [{
                     'id': 4,
                     'user_id': 3,
-                    'datetime': str(datetime.datetime.today() - datetime.timedelta(days=8)),
+                    'booking_datetime': str(datetime.datetime.today() - datetime.timedelta(days=8)),
                     'restaurant_id': 1,
                     'entrance_datetime': str(datetime.datetime.today())
                 }]
 
-                url = URL_BOOKINGS + '/bookings?datetime='+str(booking['datetime'])+'&restaurant_id=1&begin_entrance=' + str(begin) + '&end_entrance=' + str(end)
+                url = URL_BOOKINGS + '/bookings?rest=1&begin_entrance=' + str(begin) + '&end_entrance=' + str(end)
                 mock.get(url, json=bookings_contact)
                 bookings_future_contact = [{
                     'id': 5,
                     'user_id': 5,
-                    'datetime': str(datetime.datetime.today() + datetime.timedelta(days=8)),
+                    'booking_datetime': str(datetime.datetime.today() + datetime.timedelta(days=8)),
                     'restaurant_id': 1
                 }]
                 mock.get(url, json=bookings_future_contact)
@@ -351,8 +351,8 @@ class UsersTest(unittest.TestCase):
         client = self.app.test_client()
         with requests_mock.mock() as mock:
             no_bookings = []
-            begin = str(datetime.datetime.today())
-            url = URL_BOOKINGS + '/bookings?rest_id=1&begin=' + begin[:10]
+            begin = str(datetime.datetime.today().isoformat())
+            url = URL_BOOKINGS + '/bookings?rest=1&begin=' + begin[:10]
             mock.get(url, json=no_bookings)
             url_rest = URL_RESTAURANTS + '/restaurants/1'
             response = {'status_code': 204}
