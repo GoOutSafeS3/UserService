@@ -110,7 +110,7 @@ def edit_user(user_id):
             else:
                 user.is_positive = False
                 user.positive_datetime = None
-        if "ssn" not in req:
+        if "ssn" not in req or req["ssn"] is None:
             user.ssn = None
         else:
             user_ssn = db.session.query(User).filter_by(ssn=req['ssn']).first()
