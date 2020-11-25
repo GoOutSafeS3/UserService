@@ -13,7 +13,9 @@ def get_from(url, params=None):
         else:
             r = req.get(url, timeout=2)
         try:
-            return r.json(), r.status_code
+            json = r.json()
+            status = r.status_code
+            return json, status
         except:  # pragma: no cover
             return {
                        "type": "about:blank",
@@ -35,7 +37,9 @@ def delete_from(url):
     try:
         r = req.delete(url, timeout=current_app.config["TIMEOUT"])
         try:
-            return r.json(), r.status_code
+            json = r.json()
+            status = r.status_code
+            return json, status
         except:
             return {
                        "type": "about:blank",
@@ -95,7 +99,7 @@ def delete_user_(user):
                    "detail": '',
                }, 204
     except Exception as e: # pragma : no cover
-        print(e)
+        print(e) 
         db.session.rollback()
         return Error500().get()
 
@@ -122,5 +126,5 @@ def mark_positive_user(id_user):
             db.session.commit()
             return True
         except:  # pragma: no cover
-            db.session.rollback()
-            return False
+            db.session.rollback() # pragma: no cover
+            return False # pragma: no cover

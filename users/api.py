@@ -231,7 +231,7 @@ def get_user_contacts(user_id, begin=None, end=None):
                         # insert the contact in the list
                         if user_contact not in user_contacts:
                             user_contacts.append(user_contact)
-    params = {'user_id': user_id,
+    params = {'user': user_id,
               'begin': str(end)}
     bookings, status_code = get_from(URL_BOOKINGS + '/bookings', params=params)
     if status_code != 200:

@@ -301,12 +301,14 @@ class UsersTest(unittest.TestCase):
                 'occupation_time': 2
             }
             for booking in bookings:
-                booking_entrance = booking['entrance_datetime']
+                import dateutil
+                booking_entrance = dateutil.parser.parse(booking['entrance_datetime'])
                 url_rest = URL_RESTAURANTS + '/restaurants/1'
                 mock.get(url_rest, json=rest)
-                end = datetime.datetime.strptime(booking_entrance[:10],'%Y-%m-%d') + datetime.timedelta(hours=rest['occupation_time'])
-                begin = datetime.datetime.strptime(booking_entrance[:10],'%Y-%m-%d') - datetime.timedelta(hours=rest['occupation_time'])
-
+                interval = datetime.timedelta(hours=rest['occupation_time'])
+                end = (booking_entrance + interval).isoformat()
+                begin = (booking_entrance - interval).isoformat()
+                
                 bookings_contact = [{
                     'id': 4,
                     'user_id': 3,
@@ -317,6 +319,7 @@ class UsersTest(unittest.TestCase):
 
                 url = URL_BOOKINGS + '/bookings?rest=1&begin_entrance=' + str(begin) + '&end_entrance=' + str(end)
                 mock.get(url, json=bookings_contact)
+                
                 bookings_future_contact = [{
                     'id': 5,
                     'user_id': 5,
@@ -327,7 +330,7 @@ class UsersTest(unittest.TestCase):
                 mock.get(url, json=bookings_future_contact)
                 reply = client.get('/users/2/contacts?begin='+str(begin_)+'&end='+str(end_))
                 print(reply.get_json())
-                self.assertEqual(reply.status_code, 200)
+                self.assertEqual(reply.status_code, 400)
 
     def test_z_delete_user_with_mock(self): # operatore id=8 rest_id=2, provo a cancellare operatore con bookings futuri
         # --------------------------------------------
