@@ -5,7 +5,7 @@ import logging
 import configparser
 import sys
 import os
-from users.database import db
+from users.database import db, User
 from users.utils import add_user, mark_positive_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask import current_app
@@ -25,7 +25,6 @@ DEFAULT_CONFIGURATION = {
     "SQLALCHEMY_DATABASE_URI": "db/users.db", # the database path/name
     "SQLALCHEMY_TRACK_MODIFICATIONS": False,
 
-    "USE_MOCKS": False, # use mocks for external calls
     "TIMEOUT": 2,  # timeout for external calls
     "REST_SERVICE_URL": "http://restaurants:8080", # restaurant microservice url
     "BOOK_SERVICE_URL": "http://bookings:8080/",
@@ -38,19 +37,45 @@ DEFAULT_CONFIGURATION = {
 
 def fake_data():
     birth = datetime.datetime.today() - datetime.timedelta(weeks=1564)
-    add_user("Gianni", "Barbuti", "gianni@example.com", generate_password_hash("gianni"), "46966711", birth - datetime.timedelta(weeks=500,days=40))
-    add_user("Daniele", "Verdi", "daniele@example.com", generate_password_hash("daniele"), "46338411", birth - datetime.timedelta(weeks=100,days=4))
-    add_user("Anna", "Rossi", "anna@example.com", generate_password_hash("anna"), "46968411", birth, ssn="ANNASSN4791DFGYU")
-    add_user("Giulia", "Nani", "nani@example.com", generate_password_hash("giulia"), "3939675681", birth- datetime.timedelta(weeks=100,days=21))
-    add_user("Admin","Admin","admin@example.com",generate_password_hash("admin"),"3665479701", (birth - datetime.timedelta(weeks=600,days=10)),is_admin=True)
-    add_user("Health","Authority","health@example.com",generate_password_hash("health"),"557692170",birth,is_health=True)
-    add_user('Operator',"Trial",'operator@example.com',generate_password_hash('operator'),'3245678432', birth, rest_id=1, is_operator=True)
-    add_user('Operator', "Trial2", 'operator2@example.com', generate_password_hash('operator'), '3245674421', birth, rest_id=2, is_operator=True)
-    add_user('Operator', "Trial3", 'operator3@example.com', generate_password_hash('operator'), '3245421324', birth, rest_id=3, is_operator=True)
-    add_user('Operator', "Trial4", 'operator4@example.com', generate_password_hash('operator'), '4536721215', birth, rest_id=4, is_operator=True)
-    add_user('Operator', "Trial5", 'operator5@example.com', generate_password_hash('operator'), '4536741121', birth, rest_id=None, is_operator=True)
-    add_user('Operator', "Trial6", 'operator6@example.com', generate_password_hash('operator'), '6457812732', birth, rest_id=None, is_operator=True)
-    add_user("Alice", "Vecchio", "alice@example.com", generate_password_hash("alice"), "463366711", birth + datetime.timedelta(weeks=23, days=40))
+    if db.session.query(User).filter_by(email = 'gianni@example.com').first() is None:
+        add_user("Gianni", "Barbuti", "gianni@example.com", generate_password_hash("gianni"), "46966711", birth - datetime.timedelta(weeks=500,days=40))
+
+    if db.session.query(User).filter_by(email='daniele@example.com').first() is None:
+        add_user("Daniele", "Verdi", "daniele@example.com", generate_password_hash("daniele"), "46338411", birth - datetime.timedelta(weeks=100,days=4))
+
+    if db.session.query(User).filter_by(email='anna@example.com').first() is None:
+        add_user("Anna", "Rossi", "anna@example.com", generate_password_hash("anna"), "46968411", birth, ssn="ANNASSN4791DFGYU")
+
+    if db.session.query(User).filter_by(email='giulia@example.com').first() is None:
+        add_user("Giulia", "Nani", "giulia@example.com", generate_password_hash("giulia"), "3939675681", birth- datetime.timedelta(weeks=100,days=21))
+
+    if db.session.query(User).filter_by(email='admin@example.com').first() is None:
+        add_user("Admin","Admin","admin@example.com",generate_password_hash("admin"),"3665479701", (birth - datetime.timedelta(weeks=600,days=10)),is_admin=True)
+
+    if db.session.query(User).filter_by(email='health@example.com').first() is None:
+        add_user("Health","Authority","health@example.com",generate_password_hash("health"),"557692170",birth,is_health=True)
+
+    if db.session.query(User).filter_by(email='operator@example.com').first() is None:
+        add_user('Operator',"Trial",'operator@example.com',generate_password_hash('operator'),'3245678432', birth, rest_id=1, is_operator=True)
+
+    if db.session.query(User).filter_by(email='operator2@example.com').first() is None:
+        add_user('Operator', "Trial2", 'operator2@example.com', generate_password_hash('operator'), '3245674421', birth, rest_id=2, is_operator=True)
+
+    if db.session.query(User).filter_by(email='operator3@example.com').first() is None:
+        add_user('Operator', "Trial3", 'operator3@example.com', generate_password_hash('operator'), '3245421324', birth, rest_id=3, is_operator=True)
+
+    if db.session.query(User).filter_by(email='operator4@example.com').first() is None:
+        add_user('Operator', "Trial4", 'operator4@example.com', generate_password_hash('operator'), '4536721215', birth, rest_id=4, is_operator=True)
+
+    if db.session.query(User).filter_by(email='operator5@example.com').first() is None:
+        add_user('Operator', "Trial5", 'operator5@example.com', generate_password_hash('operator'), '4536741121', birth, rest_id=None, is_operator=True)
+
+    if db.session.query(User).filter_by(email='operator6@example.com').first() is None:
+        add_user('Operator', "Trial6", 'operator6@example.com', generate_password_hash('operator'), '6457812732', birth, rest_id=None, is_operator=True)
+
+    if db.session.query(User).filter_by(email='alice@example.com').first() is None:
+        add_user("Alice", "Vecchio", "alice@example.com", generate_password_hash("alice"), "463366711", birth + datetime.timedelta(weeks=23, days=40))
+
     if mark_positive_user(13):
         print('Marked')
 
