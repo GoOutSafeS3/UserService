@@ -109,7 +109,7 @@ def edit_user(user_id):
             else:
                 user.is_positive = False
                 user.positive_datetime = None
-        if not req['ssn']:
+        if "ssn" not in req:
             user.ssn = None
         else:
             user_ssn = db.session.query(User).filter_by(ssn=req['ssn']).first()
@@ -120,6 +120,8 @@ def edit_user(user_id):
             user.rest_id = int(req['rest_id'])
         db.session.commit()
     except:
+        import traceback
+        traceback.print_exc()
         db.session.rollback()
         return Error500().get()
 
