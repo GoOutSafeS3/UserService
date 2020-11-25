@@ -351,5 +351,9 @@ components:
           format: date-time
           description: When the user was marked as positive
           example: "2020-11-10T10:30:00+1:00"
+        flag:
+          type: string
+          nullable: true
+          description: in case of get contact say what kind of contact
 
 

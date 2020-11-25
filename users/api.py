@@ -188,14 +188,11 @@ def get_user_contacts(user_id, begin=None, end=None):
               'begin': str(begin),
               'end': str(end)}
     bookings, status_code = get_from(URL_BOOKINGS + '/bookings', params=params)
-    print(bookings)
-    print(status_code)
     if status_code != 200:
         return Error400('BookingService error').get()
     for booking in bookings:
         dateofbooking = booking['booking_datetime']
         restaurant, status_code = get_from(URL_RESTAURANTS + '/restaurants/' + str(booking['restaurant_id']))
-        print(restaurant)
         if status_code != 200:
             return Error400("Restaurant Service error, Try again").get()
 
@@ -207,6 +204,11 @@ def get_user_contacts(user_id, begin=None, end=None):
         except:
             booking_entrance = None
         if booking_entrance is not None:
+            user_rest = db.session.query(User).filter_by(rest_id=booking['restaurant_id']).first()
+            user_rest = user_rest.to_json()
+            user_rest["flag"]="OP-OLD"
+            user_contacts.append(user_rest)
+            
             end = (booking_entrance + interval).isoformat()
             begin = (booking_entrance - interval).isoformat()
 
@@ -215,15 +217,12 @@ def get_user_contacts(user_id, begin=None, end=None):
                                                 'begin_entrance': str(begin),
                                                 'end_entrance': str(end)})
 
-            print(contact_bookings)
 
             if status_code != 200:
                 return Error400("Booking Service error, Try again").get()
             for contact in contact_bookings:
                 user_id_contact = contact['user_id']
                 date = contact['booking_datetime']
-                print('date '+date[:10])
-                print('date ' + dateofbooking[:10])
                 if user_id_contact != user_id and date[:10] == dateofbooking[:10]:
 
                     user_contact = db.session.query(User).filter_by(id=user_id_contact).first()
@@ -232,6 +231,15 @@ def get_user_contacts(user_id, begin=None, end=None):
                         # insert the contact in the list
                         if user_contact not in user_contacts:
                             user_contacts.append(user_contact)
-    print(user_contacts)
+    params = {'user_id': user_id,
+              'begin': str(end)}
+    bookings, status_code = get_from(URL_BOOKINGS + '/bookings', params=params)
+    if status_code != 200:
+        return Error400('BookingService error').get()
+    for booking in bookings:
+        user_rest = db.session.query(User).filter_by(rest_id=booking['restaurant_id']).first()
+        user_rest = user_rest.to_json()
+        user_rest["flag"]="OP-FUTURE"
+        user_contacts.append(user_rest)
 
     return jsonify(user_contacts), 200
