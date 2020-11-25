@@ -169,8 +169,8 @@ def delete_user(user_id):
 
 def get_user_contacts(user_id, begin=None, end=None):
     if begin is None and end is None:
-        end = datetime.datetime.today()
-        begin = end - datetime.timedelta(weeks=2)
+        end = datetime.datetime.today().isoformat()
+        begin = (end - datetime.timedelta(weeks=2)).isoformat()
     elif (begin is None and end is not None) or (begin is not None and end is None):
         return Error400("Specify both dates or none").get()
     user_contacts = []
@@ -206,10 +206,13 @@ def get_user_contacts(user_id, begin=None, end=None):
 
             # inserire data
             contact_bookings, status_code = get_from(URL_BOOKINGS + '/bookings',
-                                        params={'restaurant_id': booking['restaurant_id'],
+                                        params={'rest_id': booking['restaurant_id'],
                                                 'datetime' : booking['datetime'],
                                                 'begin_entrance': str(begin),
                                                 'end_entrance': str(end)})
+
+            print(contact_bookings)
+             
             if status_code != 200:
                 return Error400("Booking Service error, Try again").get()
             for contact in contact_bookings:
@@ -220,5 +223,6 @@ def get_user_contacts(user_id, begin=None, end=None):
                         user_contact = user_contact.to_json()
                         # insert the contact in the list
                         user_contacts.append(user_contact)
+    print(user_contacts)
 
     return jsonify(user_contacts), 200
