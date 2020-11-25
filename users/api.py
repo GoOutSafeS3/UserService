@@ -147,7 +147,7 @@ def delete_user(user_id):
         bookings, status_code = get_from(url, params)
         if status_code != 200:
             return Error400('BookingService error').get()
-        if bookings:
+        if bookings and bookings!=[]:
             return Error400("you cannot delete the account if you have active reservations in your restaurant").get()
         else:
             url = URL_RESTAURANTS + '/restaurants/' + str(user.rest_id)
@@ -172,7 +172,8 @@ def delete_user(user_id):
 def get_user_contacts(user_id, begin=None, end=None):
     if begin is None and end is None:
         end = datetime.datetime.today()
-        begin = end - datetime.timedelta(weeks=2)
+        begin = (end - datetime.timedelta(weeks=2)).isoformat()
+        end = end.isoformat()
     elif (begin is None and end is not None) or (begin is not None and end is None):
         return Error400("Specify both dates or none").get()
     user_contacts = []
@@ -189,7 +190,9 @@ def get_user_contacts(user_id, begin=None, end=None):
     if status_code != 200:
         return Error400('BookingService error').get()
     for booking in bookings:
+        dateofbooking = booking['booking_datetime']
         restaurant, status_code = get_from(URL_RESTAURANTS + '/restaurants/' + str(booking['restaurant_id']))
+        print(restaurant)
         if status_code != 200:
             return Error400("Restaurant Service error, Try again").get()
 
@@ -201,26 +204,30 @@ def get_user_contacts(user_id, begin=None, end=None):
         except:
             booking_entrance = None
         if booking_entrance is not None:
-            end = booking_entrance + interval
-            begin = booking_entrance - interval
+            end = (booking_entrance + interval).isoformat()
+            begin = (booking_entrance - interval).isoformat()
 
-            # get the bookings (of the same restaurant) in the occupation time interval
-
-            # inserire data
             contact_bookings, status_code = get_from(URL_BOOKINGS + '/bookings',
-                                        params={'restaurant_id': booking['restaurant_id'],
-                                                'datetime' : booking['datetime'],
+                                        params={'rest': booking['restaurant_id'],
                                                 'begin_entrance': str(begin),
                                                 'end_entrance': str(end)})
+
+            print(contact_bookings)
+
             if status_code != 200:
                 return Error400("Booking Service error, Try again").get()
             for contact in contact_bookings:
                 user_id_contact = contact['user_id']
-                if user_id_contact != user_id:
+                date = contact['booking_datetime']
+                print('date '+date[:10])
+                print('date ' + dateofbooking[:10])
+                if user_id_contact != user_id and date[:10] == dateofbooking[:10]:
+
                     user_contact = db.session.query(User).filter_by(id=user_id_contact).first()
                     if user_contact is not None:
                         user_contact = user_contact.to_json()
                         # insert the contact in the list
                         user_contacts.append(user_contact)
+    print(user_contacts)
 
     return jsonify(user_contacts), 200
