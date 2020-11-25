@@ -323,6 +323,7 @@ class UsersTest(unittest.TestCase):
                     'booking_datetime': str(datetime.datetime.today() + datetime.timedelta(days=8)),
                     'restaurant_id': 1
                 }]
+                url = URL_BOOKINGS + '/bookings?user=2&begin=' + str(begin)
                 mock.get(url, json=bookings_future_contact)
                 reply = client.get('/users/2/contacts?begin='+str(begin_)+'&end='+str(end_))
                 print(reply.get_json())
