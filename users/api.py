@@ -138,11 +138,10 @@ def delete_user(user_id):
         return Error400("You cannot delete your data as long as you are positive").get()
 
     today = str(datetime.datetime.today())
-    params = {'rest_id': user.rest_id,
-              'begin': today[:10]}
 
     if user.is_operator and user.rest_id is not None:  # the user is operator with restaurant
-
+        params = {'rest': user.rest_id,
+              'begin': today[:10]}
         url = URL_BOOKINGS + '/bookings'
 
         bookings, status_code = get_from(url, params)
@@ -151,6 +150,8 @@ def delete_user(user_id):
         if bookings and bookings!=[]:
             return Error400("you cannot delete the account if you have active reservations in your restaurant").get()
         else:
+            params = {'user': user.id,
+              'begin': today[:10]}
             url = URL_RESTAURANTS + '/restaurants/' + str(user.rest_id)
             resp, status_code = delete_from(url)
             if status_code == 204 or status_code == 200:
@@ -159,12 +160,13 @@ def delete_user(user_id):
                 return Error400('Error on try to delete the restaurant').get()
 
     else:  # the user is not operator
-
+        params = {'user': user.id,
+              'begin': today[:10]}
         url = URL_BOOKINGS + '/bookings'
         bookings,status_code = get_from(url=url, params=params)
         if status_code != 200:
             return Error400('BookingService error').get(), 400
-        if bookings:
+        if bookings and bookings!=[]:
             return Error400("you cannot delete the account if you have active reservations").get()
 
     return delete_user_(user), 204

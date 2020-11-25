@@ -8,6 +8,7 @@ db = SQLAlchemy()
 
 class User(db.Model):
     __tablename__ = 'user'
+    __table_args__ = {'sqlite_autoincrement':True}
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     rest_id = db.Column(db.Integer)
     email = db.Column(db.Unicode(128), nullable=False, unique=True)
