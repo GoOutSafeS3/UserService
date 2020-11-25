@@ -74,7 +74,7 @@ def fake_data():
         add_user('Operator', "Trial6", 'operator6@example.com', generate_password_hash('operator'), '6457812732', birth, rest_id=None, is_operator=True)
 
     if db.session.query(User).filter_by(email='alice@example.com').first() is None:
-        add_user("Alice", "Vecchio", "alice@example.com", generate_password_hash("alice"), "463366711", birth + datetime.timedelta(weeks=23, days=40), ssn="TESTALICESSN")
+        add_user("Alice", "Vecchio", "alice@example.com", generate_password_hash("alice"), "463366711", birth + datetime.timedelta(weeks=23, days=40), ssn="TESTALICESSN1234")
 
     if mark_positive_user(13):
         print('Marked')
