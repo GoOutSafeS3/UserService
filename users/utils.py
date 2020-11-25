@@ -80,7 +80,7 @@ def add_user(firstname, lastname, email, password, phone, dateofbirth,
             new_user.rest_id = rest_id
         db.session.add(new_user)
         db.session.commit()
-        return new_user.to_json()
+        return new_user.to_json(),201
     except Exception as e:
         print(e)  # pragma: no cover
         db.session.rollback()

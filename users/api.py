@@ -32,7 +32,7 @@ def get_users(ssn=None, phone=None, email=None, is_positive=None):
 
 def create_user():
     req = request.json
-    ssn = ''
+    ssn = None
     is_health = False
     is_admin = False
     exist_ssn = None
@@ -47,7 +47,7 @@ def create_user():
     is_operator = req['is_operator']
     if 'is_admin' in req:
         is_admin = req['is_admin']
-    if 'is_health' in req:
+    if 'is_health_authority' in req:
         is_health = req['is_health_authority']
     exist_email = db.session.query(User).filter_by(email=email).first()
     exist_phone = db.session.query(User).filter_by(phone=phone).first()
@@ -68,8 +68,8 @@ def create_user():
                         password,
                         phone,
                         datetime.datetime.strptime(dateofbirth[:10], '%Y-%m-%d'),
-                        is_health, is_operator, is_admin)
-    return response, 200
+                        None, ssn, is_health, is_operator, is_admin)
+    return response
 
 
 def get_id_user(user_id):

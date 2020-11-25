@@ -82,7 +82,7 @@ class UsersTest(unittest.TestCase):
         }
         response = client.post('/users', json=new_user)
         json = response.get_json()
-        self.assertEqual(response.status_code, 200, msg=json)
+        self.assertEqual(response.status_code, 201, msg=json)
         new_user = {
             'email': 'new@example.com',
             'password': generate_password_hash('new'),
@@ -127,7 +127,7 @@ class UsersTest(unittest.TestCase):
         response = client.post('/users', json=new_user)
         json = response.get_json()
         self.assertEqual(response.status_code, 400, msg=json)
-
+        
     def test_edit_user_mark(self):
         client = self.app.test_client()
         modify_user = {
@@ -352,7 +352,6 @@ class UsersTest(unittest.TestCase):
             mock.delete(url_rest, json=response)
             reply = client.delete('/users/7')
             self.assertEqual(reply.status_code, 204)
-
 
 if __name__ == '__main__':
     unittest.main()
